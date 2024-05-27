@@ -18,10 +18,10 @@ inf = 50;
 eps = 0.001;
 
 // thickness of 'wood grasping' parts
-a = 1.25;
+a = 1.5;
 
 // base z thicknesses
-b = 1.25;
+b = 1.5;
 c = 1.5;
 
 d = 0.5;
@@ -31,8 +31,7 @@ d = 0.5;
 W = 2.8;
 
 // gap between shelf and 'grasping' wall (on just one side)
-G = 0.0;
-
+G = -0.05;
 
 // protrusion of the arm grippers away from centre
 f = 7.75;
@@ -89,8 +88,12 @@ enable_slope_cut = false;
 
 pp = enable_slope_cut ? 2 : f;
 
+// de-confusion helper: cuts a circle on the side that should face up or down in final construction
+helper_circle_enable = true;
+helper_circle_radius = 1;
+helper_circle_depth = 0.3;
 
-module main(miss_centre_beam_angles = [], miss_quarter_cut_angles = []) {
+module main(miss_centre_beam_angles = [], miss_quarter_cut_angles = [], miss_vertical_holder_angles = []) {
     difference() {
         base_for_cutting();
 
@@ -100,7 +103,8 @@ module main(miss_centre_beam_angles = [], miss_quarter_cut_angles = []) {
                 // the cutaways at top (the very visible ones)
                 translate([0, 0, base_part_height]) {
                     // big corner cut
-                    translate([x - eps, x - eps, 0])
+                    corner_cut_y_trans = in_array(rot, miss_vertical_holder_angles) ? -inf/2 : x - eps;
+                    translate([x - eps, corner_cut_y_trans, 0])
                         cube(inf);
                     // cut for the upright shelf gripper
                     if (!in_array(rot, miss_centre_beam_angles)) {
@@ -130,29 +134,67 @@ module main(miss_centre_beam_angles = [], miss_quarter_cut_angles = []) {
 //                    cube(30);
             }
         }  
+       
+        // helper circle
+        translate([0, 0, -eps])
+            cylinder(h = helper_circle_depth + eps, r = helper_circle_radius, $fn = 16);
     }    
 }
 
-piece_tx = 32;
+piece_tx = 24;
 
 // piece 1 (entire piece)
-main();
+translate([-piece_tx, 0, -eps])
+    main();
 
 // piece 2 (two quadrants)
-translate([-piece_tx, 0, -eps])
-    intersection() {
-        main(miss_centre_beam_angles = [90], miss_quarter_cut_angles = [90, 180]);
-        translate([-T_1b / 2, -inf/2, 0])
-            cube(inf);
-    }
+intersection() {
+    main(miss_centre_beam_angles = [90], miss_quarter_cut_angles = [90, 180]);
+    translate([-T_1b / 2, -inf/2, 0])
+        cube(inf);
+}
 
-// piece 1 (one quadrant)
+// piece 3 (one quadrant)
 translate([piece_tx, 0, -eps])
     intersection() {
         main(miss_centre_beam_angles = [90, 180], miss_quarter_cut_angles = [90, 180, 270]);
         translate([-T_1b / 2, -T_1b / 2, 0])
             cube(inf);
     }
+
+// piece 4 (one quadrant, only one upright holder, not two -- for front corner (open shelf))
+// piece 3 (one quadrant)
+
+module piece4() {
+    intersection() {
+        main(miss_centre_beam_angles = [90, 180, 270], miss_quarter_cut_angles = [90, 180, 270],
+            miss_vertical_holder_angles = [0]);
+        translate([-T_1b / 2, -T_1b / 2, 0])
+            cube(inf);
+    }
+}
+
+//translate([2 * piece_tx, 0, -eps])
+    piece4();
+
+// piece 5 -- just piece 4 mirrored in y/z plane
+translate([3 * piece_tx, 0, -eps])
+    scale([-1, 1, 1])
+        piece4();
+
+
+
+
+translate([2 * piece_tx, 0, -eps]) {
+    intersection() {
+        main(miss_centre_beam_angles = [90, 180, 270], miss_quarter_cut_angles = [90, 180, 270],
+            miss_vertical_holder_angles = [0]);
+        translate([-T_1b / 2, -T_1b / 2, 0])
+            cube(inf);
+    }
+    
+}
+
 
 echo(total_height);
 
