@@ -35,7 +35,7 @@ G = 0.1;
 
 
 // protrusion of the arm grippers away from centre
-f = 7;
+f = 7.75;
 
 // 'nobble' grip radius
 r = 0; // impl later
@@ -63,6 +63,10 @@ base_part_height = T_2b;
 x = T_1b / 2;
 y = f + T_1b / 2;
 
+
+// amount we cut into the 45 degree slopes
+slope_cut_in = 2;
+
 oct_poly_coords = [
                     [x, y], [y, x],
                     [y, -x], [x, -y],
@@ -76,6 +80,12 @@ module base_for_cutting() {
         polygon(oct_poly_coords);
     }
 }
+
+// grip travel from body.
+// this limits our grip to being cut away this amount from the wall.
+// To reduce print time.
+// To disable, set to a large value.
+pp = 2;
 
 module main() {
     difference() {
@@ -99,15 +109,18 @@ module main() {
                 }
                 
                 // the 4 cutaways in base (more hidden)
-                translate([0, 0, 0]) {
-                    // cut for the upright shelf gripper
-//                    translate([- x / 2, x - x / 2 + 0.5, 0])
-//                        cube([3, inf, T_2]);
-                    // big corner cut
-                    translate([d, d, c - G])
-                        cube([inf, inf, T_2]);
+                // big corner cut
+                translate([d, d, c - G])
+                    cube([inf, inf, T_2]);
+
+//                translate([- inf / 2, T_1b / 2 + f/2 - pp, base_part_height + f/2 - pp])
+                translate([- inf / 2, T_1b / 2 + pp, base_part_height + pp])
+                    cube([inf, inf, inf]);
                 
-                }
+                // reduction cut similar to notch further after corner cut
+                
+//                translate([(T_1b + f)/2, (T_1b + f)/2, 0])
+//                    cube(30);
             }
         }  
     }    
