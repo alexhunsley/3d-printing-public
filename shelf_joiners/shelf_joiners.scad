@@ -31,7 +31,7 @@ d = 0.5;
 W = 2.8;
 
 // gap between shelf and 'grasping' wall (on just one side)
-G = 0.05;
+G = 0.0;
 
 
 // protrusion of the arm grippers away from centre
@@ -84,10 +84,13 @@ module base_for_cutting() {
 // grip travel from body.
 // this limits our grip to being cut away this amount from the wall.
 // To reduce print time.
-// To disable, set to a large value.
-pp = 2;
+// To disable, set to 0.
+enable_slope_cut = false;
 
-module main() {
+pp = enable_slope_cut ? 2 : f;
+
+
+module main(miss_centre_beam_angles = [], miss_quarter_cut_angles = []) {
     difference() {
         base_for_cutting();
 
@@ -100,8 +103,10 @@ module main() {
                     translate([x - eps, x - eps, 0])
                         cube(inf);
                     // cut for the upright shelf gripper
-                    translate([- T_1 / 2, x - x / 2 + 0.5, 0])
-                        cube([T_1, inf, inf]);
+                    if (!in_array(rot, miss_centre_beam_angles)) {
+                        translate([- T_1 / 2, x - x / 2 + 0.5, 0])
+                            cube([T_1, inf, inf]);
+                    }
                     // slope cut at 45 deg
                     translate([-inf/2, x, f])
                         rotate([-45, 0, 0])
@@ -110,10 +115,12 @@ module main() {
                 
                 // the 4 cutaways in base (more hidden)
                 // big corner cut
-                translate([d, d, c - G])
-                    cube([inf, inf, T_2]);
-
-//                translate([- inf / 2, T_1b / 2 + f/2 - pp, base_part_height + f/2 - pp])
+                if (!in_array(rot, miss_quarter_cut_angles)) {
+                    translate([d, d, c - G])
+                        cube([inf, inf, T_2]);
+                }
+                
+                // little notch in the 45 degree slope
                 translate([- inf / 2, T_1b / 2 + pp, base_part_height + pp])
                     cube([inf, inf, inf]);
                 
@@ -126,7 +133,7 @@ module main() {
     }    
 }
 
-piece_tx = 22;
+piece_tx = 32;
 
 // piece 1 (entire piece)
 main();
@@ -134,7 +141,7 @@ main();
 // piece 2 (two quadrants)
 translate([-piece_tx, 0, -eps])
     intersection() {
-        main();
+        main(miss_centre_beam_angles = [90], miss_quarter_cut_angles = [90, 180]);
         translate([-T_1b / 2, -inf/2, 0])
             cube(inf);
     }
@@ -142,7 +149,7 @@ translate([-piece_tx, 0, -eps])
 // piece 1 (one quadrant)
 translate([piece_tx, 0, -eps])
     intersection() {
-        main();
+        main(miss_centre_beam_angles = [90, 180], miss_quarter_cut_angles = [90, 180, 270]);
         translate([-T_1b / 2, -T_1b / 2, 0])
             cube(inf);
     }
@@ -150,14 +157,12 @@ translate([piece_tx, 0, -eps])
 echo(total_height);
 
 
-
-
-
-
-
-
-
-
-
-
-
+// helpers
+    
+function in_array(value, arr) = len(search(value, arr)) > 0;
+    
+//let t = in_array(5, [1, 2, 5, 7]);
+    
+//echo("ASDasd", in_array(2, [1, 2, 5, 7]));
+    
+    
