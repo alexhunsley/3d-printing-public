@@ -18,11 +18,11 @@ inf = 50;
 eps = 0.001;
 
 // thickness of 'wood grasping' parts
-a = 0.75;
+a = 1.25;
 
 // base z thicknesses
-b = 1;
-c = 1.25;
+b = 1.25;
+c = 1.5;
 
 d = 0.5;
 
@@ -31,7 +31,7 @@ d = 0.5;
 W = 2.8;
 
 // gap between shelf and 'grasping' wall (on just one side)
-G = 0.1;
+G = 0.05;
 
 
 // protrusion of the arm grippers away from centre
