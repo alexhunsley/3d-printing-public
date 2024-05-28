@@ -30,7 +30,7 @@ d = 1;
 
 
 // support pillars for 'no Y gap' design
-pillar_radius = 4.5;
+pillar_radius = 3.5;
         
 // minimises the gap at back around rear and centre part walls.
 // We must have a gap somewhere, for co,pletely square pieces to work.
@@ -70,6 +70,7 @@ base_part_height_for_front_pieces = b;
 
 x = T_1b / 2;
 y = f + T_1b / 2;
+
 
 
 // amount we cut into the 45 degree slopes
@@ -158,6 +159,9 @@ module main(doing_front_piece = true, miss_centre_beam_angles = [], miss_quarter
 //                    cube(30);
             }
         }
+        
+
+        
     }     
     // pillars
     if (no_y_gap_fix_enabled && !doing_front_piece) {
@@ -168,14 +172,43 @@ module main(doing_front_piece = true, miss_centre_beam_angles = [], miss_quarter
             }
         }
     }
-       
+    
+        
+    // support (v thin walled cylinder)
+    if (enable_support && !doing_front_piece) {
+        for (rot = [0 : 90 : 270]) {
+            rotate([0, 0, rot]) {
+                translate([support_cylinder_offset_dist, support_cylinder_offset_dist, c-eps])
+                    cylinder_hollow(h = T_2 + 1, rd = suport_cyl_r2, thickness = support_cyl_thickness, $fn = 10);
+            }
+        }
+    }
+    
     // helper circle on front/back face
     // (TODO two circles for back, one for front?)
     translate([0, 0, -eps])
         quarter_cylinder(h = helper_circle_depth + eps, r = helper_circle_radius);
 }
 
+module cylinder_hollow(h, rd, thickness) {
+    difference() {
+        translate([0, 0, -eps])
+            cylinder(h, r = rd, $fn = 16);
+            cylinder(h, r = rd - thickness, $fn = 16);
+    }
+}
+
+enable_support = false;
+
+// why will these 'support' cylinders not stick to the pieces?! They're free roaming when I do arrange.
+support_cylinder_offset_dist = 5.05;
+
+// the temp support (to avoid having to do it repeatedly in prusa slicer):
+suport_cyl_r2 = 2.2;
+
 circle_segs = 32;
+
+support_cyl_thickness = 0.4;
 
 module quarter_cylinder(h, r) {
     difference() {
