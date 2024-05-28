@@ -26,6 +26,10 @@ c = 1.5;
 
 d = 1;
 
+
+// minimises the gap at back around rear and centre part walls.
+// We must have a gap somewhere, for co,pletely square pieces to work.
+
 vertical_support_sink_amount = 0.75;
 
 // wood (shelf) thickness
@@ -109,18 +113,17 @@ module main(doing_front_piece = true, miss_centre_beam_angles = [], miss_quarter
         // cuts
         for (rot = [0 : 90 : 270]) {
             rotate([0, 0, rot]) {
-                // the cutaways at top (the very visible ones)
+                // cut for the upright shelf gripper (v visible ones)
+                if (!in_array(rot, miss_centre_beam_angles)) {
+                    translate([- T_1 / 2, (x - T_1) / 2 + d, c + T_2 / 2 + d])                            cube([T_1, inf, inf]);
+                }
+
                 translate([0, 0, height]) {
                     // big corner cut
 //                    corner_cut_y_trans = in_array(rot, miss_vertical_holder_angles) ? -inf/2 : x - eps;
                     
                     translate([x - eps, x - eps, 0])
                         cube(inf);
-                    // cut for the upright shelf gripper
-                    if (!in_array(rot, miss_centre_beam_angles)) {
-                        translate([- T_1 / 2, x - x / 2 - T_1 / 2 + d, -vertical_support_sink_amount])
-                            cube([T_1, inf, inf]);
-                    }
                     // slope cut at 45 deg
                     translate([-inf/2, x, f])
                         rotate([-45, 0, 0])
