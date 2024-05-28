@@ -37,6 +37,7 @@ pillar_radius = 4.5;
 
 // wood (shelf) thickness
 W = 2.8;
+//W = 0.9;
 
 // gap between shelf and 'grasping' wall (on just one side)
 G = -0.1;
@@ -107,14 +108,14 @@ helper_circle_enable = true;
 helper_circle_radius = 1.5;
 helper_circle_depth = 0.3;
 
-no_y_gap_fix_enabled = true;
+//no_y_gap_fix_enabled = true;
 
-module main(doing_front_piece = true, miss_centre_beam_angles = [], miss_quarter_cut_angles = []) {
+module main(doing_front_piece = true, miss_centre_beam_angles = [], miss_quarter_cut_angles = [], no_y_gap_fix_enabled = true) {
     
     height = doing_front_piece ?  base_part_height_for_front_pieces : base_part_height;
          
-    use_y_offs = no_y_gap_fix_enabled ? T_2 / 2 + d : T_2 + 0.5;  //- height - 0.75; // latter todo
-
+    use_y_offs = doing_front_piece ? 0 :     no_y_gap_fix_enabled ? T_2 / 2 + d : T_2 + 0.75;
+    
     difference() {
         base_for_cutting(doing_front_piece);
         
@@ -124,7 +125,8 @@ module main(doing_front_piece = true, miss_centre_beam_angles = [], miss_quarter
         
                 // cut for the upright shelf gripper (v visible ones)
                 if (!in_array(rot, miss_centre_beam_angles)) {
-                    translate([- T_1 / 2, (x - T_1) / 2 + d, c + use_y_offs])                            cube([T_1, inf, inf]);
+                    translate([- T_1 / 2, (x - T_1) / 2 + d, b + use_y_offs])                            
+                        cube([T_1, inf, inf]);
                 }
 
                 // the 4 cutaways in base (more hidden)
@@ -189,16 +191,16 @@ module quarter_cylinder(h, r) {
 
 piece_tx = 24;
 
-module all_pieces(doing_front_piece = true) {
+module all_pieces(doing_front_piece = true, no_y_gap_fix_enabled = true) {
     
     translate([0, doing_front_piece ? 0 : piece_tx, 0]) {
         // piece 1 (entire piece)
         translate([-piece_tx, 0, -eps])
-            main(doing_front_piece);
+            main(doing_front_piece, no_y_gap_fix_enabled = no_y_gap_fix_enabled);
 
         // piece 2 (two quadrants)
         intersection() {
-            main(doing_front_piece, miss_centre_beam_angles = [90], miss_quarter_cut_angles = [90, 180]);
+            main(doing_front_piece, miss_centre_beam_angles = [90], miss_quarter_cut_angles = [90, 180], no_y_gap_fix_enabled = no_y_gap_fix_enabled);
             translate([-T_1b / 2, -inf/2, 0])
                 cube(inf);
         }
@@ -206,15 +208,12 @@ module all_pieces(doing_front_piece = true) {
     // piece 3 (one quadrant)
     translate([piece_tx, 0, -eps])
         intersection() {
-            main(doing_front_piece, miss_centre_beam_angles = [90, 180], miss_quarter_cut_angles = [90, 180, 270]);
+            main(doing_front_piece, miss_centre_beam_angles = [90, 180], miss_quarter_cut_angles = [90, 180, 270], no_y_gap_fix_enabled = no_y_gap_fix_enabled);
             translate([-T_1b / 2, -T_1b / 2, 0])
                 cube(inf);
         }
     }
 }
-
-all_pieces(doing_front_piece = false);
-all_pieces(doing_front_piece = true);
 
 
 // We only strictly need THREE pieces!
@@ -245,32 +244,42 @@ all_pieces(doing_front_piece = true);
 
 // 100 is the wood size
 panel_size = 50;
-panel_thickness = 2.8;
+panel_thickness = W;
 
 // a little give to help rotating and slotting in the panels
 pillar_gap = 0.3;
 
-
-for (panel_index = [1 : 5]) {
-    translate([(panel_size + 2) * (panel_index - 0.25), 0, 0])
-        difference() {
-            cube([panel_size, panel_size, panel_thickness]);
-            // only need one notched back panel per set of panels
-            if (panel_index == 1) {
-                union() {
-                    translate([0, 0, -eps])
-                        cylinder(panel_thickness + eps * 2, r = pillar_radius + pillar_gap, $fn = circle_segs);
-                    translate([panel_size, 0, -eps])
-                        cylinder(panel_thickness + eps * 2, r = pillar_radius + pillar_gap, $fn = circle_segs);
-                    translate([panel_size, panel_size, -eps])
-                        cylinder(panel_thickness + eps * 2, r = pillar_radius + pillar_gap, $fn = circle_segs);
-                    translate([0, panel_size, -eps])
-                        cylinder(panel_thickness + eps * 2, r = pillar_radius + pillar_gap, $fn = circle_segs);
+module do_panels() {
+    for (panel_index = [1 : 5]) {
+        translate([(panel_size + 2) * (panel_index - 0.25), 0, 0])
+            difference() {
+                cube([panel_size, panel_size, panel_thickness]);
+                // only need one notched back panel per set of panels
+                if (panel_index == 1) {
+                    union() {
+                        translate([0, 0, -eps])
+                            cylinder(panel_thickness + eps * 2, r = pillar_radius + pillar_gap, $fn = circle_segs);
+                        translate([panel_size, 0, -eps])
+                            cylinder(panel_thickness + eps * 2, r = pillar_radius + pillar_gap, $fn = circle_segs);
+                        translate([panel_size, panel_size, -eps])
+                            cylinder(panel_thickness + eps * 2, r = pillar_radius + pillar_gap, $fn = circle_segs);
+                        translate([0, panel_size, -eps])
+                            cylinder(panel_thickness + eps * 2, r = pillar_radius + pillar_gap, $fn = circle_segs);
+                    }
                 }
             }
-        }
+    }
 }
 
+
+// main execution
+all_pieces(doing_front_piece = false, no_y_gap_fix_enabled = true);
+all_pieces(doing_front_piece = true, no_y_gap_fix_enabled = false);
+
+translate([0, -50, 0]) 
+    all_pieces(doing_front_piece = false, no_y_gap_fix_enabled = false);
+
+do_panels();
 
 // helpers
     
