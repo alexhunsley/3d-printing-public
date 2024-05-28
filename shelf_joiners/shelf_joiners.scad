@@ -12,6 +12,8 @@
 // See screenshot "shelf_joiners_design_and_parameters.jpg"
 //
 
+
+
 // a big value for cutaways
 inf = 50;
 
@@ -29,8 +31,6 @@ d = 1;
 
 // minimises the gap at back around rear and centre part walls.
 // We must have a gap somewhere, for co,pletely square pieces to work.
-
-vertical_support_sink_amount = 0.75;
 
 // wood (shelf) thickness
 W = 2.8;
@@ -104,18 +104,23 @@ helper_circle_enable = true;
 helper_circle_radius = 1.5;
 helper_circle_depth = 0.3;
 
+no_y_gap_fix_enabled = false;
+
 module main(doing_front_piece = true, miss_centre_beam_angles = [], miss_quarter_cut_angles = []) {
+    
+    height = doing_front_piece ?  base_part_height_for_front_pieces : base_part_height;
+         
+    use_y_offs = no_y_gap_fix_enabled ? T_2 / 2 + d : T_2 + 0.5;  //- height - 0.75; // latter todo
+
     difference() {
         base_for_cutting(doing_front_piece);
 
-        height = doing_front_piece ?  base_part_height_for_front_pieces : base_part_height;
-        
         // cuts
         for (rot = [0 : 90 : 270]) {
             rotate([0, 0, rot]) {
                 // cut for the upright shelf gripper (v visible ones)
                 if (!in_array(rot, miss_centre_beam_angles)) {
-                    translate([- T_1 / 2, (x - T_1) / 2 + d, c + T_2 / 2 + d])                            cube([T_1, inf, inf]);
+                    translate([- T_1 / 2, (x - T_1) / 2 + d, c + use_y_offs])                            cube([T_1, inf, inf]);
                 }
 
                 translate([0, 0, height]) {
