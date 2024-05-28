@@ -173,9 +173,11 @@ module main(doing_front_piece = true, miss_centre_beam_angles = [], miss_quarter
         quarter_cylinder(h = helper_circle_depth + eps, r = helper_circle_radius);
 }
 
+circle_segs = 32;
+
 module quarter_cylinder(h, r) {
     difference() {
-        cylinder(h, r = r, $fn = 16);
+        cylinder(h, r = r, $fn = circle_segs);
         translate([-inf/2, 0, 0])
             scale([1, -1, 1])
                 cube([inf, inf, h + eps]);
@@ -239,6 +241,35 @@ all_pieces(doing_front_piece = true);
 //        piece4();
 
 
+// some rear plates
+
+// 100 is the wood size
+panel_size = 50;
+panel_thickness = 2.8;
+
+// a little give to help rotating and slotting in the panels
+pillar_gap = 0.3;
+
+
+for (panel_index = [1 : 5]) {
+    translate([(panel_size + 2) * (panel_index - 0.25), 0, 0])
+        difference() {
+            cube([panel_size, panel_size, panel_thickness]);
+            // only need one notched back panel per set of panels
+            if (panel_index == 1) {
+                union() {
+                    translate([0, 0, -eps])
+                        cylinder(panel_thickness + eps * 2, r = pillar_radius + pillar_gap, $fn = circle_segs);
+                    translate([panel_size, 0, -eps])
+                        cylinder(panel_thickness + eps * 2, r = pillar_radius + pillar_gap, $fn = circle_segs);
+                    translate([panel_size, panel_size, -eps])
+                        cylinder(panel_thickness + eps * 2, r = pillar_radius + pillar_gap, $fn = circle_segs);
+                    translate([0, panel_size, -eps])
+                        cylinder(panel_thickness + eps * 2, r = pillar_radius + pillar_gap, $fn = circle_segs);
+                }
+            }
+        }
+}
 
 
 // helpers
