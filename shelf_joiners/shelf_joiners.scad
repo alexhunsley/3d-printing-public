@@ -21,11 +21,12 @@ eps = 0.001;
 a = 1.5;
 
 // base z thicknesses
-b = 1.5;
+b = 1.25;
 c = 1.5;
 
 d = 1;
 
+vertical_support_sink_amount = 0.75;
 
 // wood (shelf) thickness
 W = 2.8;
@@ -117,7 +118,7 @@ module main(doing_front_piece = true, miss_centre_beam_angles = [], miss_quarter
                         cube(inf);
                     // cut for the upright shelf gripper
                     if (!in_array(rot, miss_centre_beam_angles)) {
-                        translate([- T_1 / 2, x - x / 2 - T_1 / 2 + d, 0])
+                        translate([- T_1 / 2, x - x / 2 - T_1 / 2 + d, -vertical_support_sink_amount])
                             cube([T_1, inf, inf]);
                     }
                     // slope cut at 45 deg
@@ -144,7 +145,8 @@ module main(doing_front_piece = true, miss_centre_beam_angles = [], miss_quarter
             }
         }  
        
-        // helper circle
+        // helper circle on front/back face
+        // (TODO two circles for back, one for front?)
         translate([0, 0, -eps])
             cylinder(h = helper_circle_depth + eps, r = helper_circle_radius, $fn = 16);
     }    
