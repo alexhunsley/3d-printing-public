@@ -29,6 +29,9 @@ c = 1.5;
 d = 1;
 
 
+// support pillars for 'no Y gap' design
+pillar_radius = 4.5;
+        
 // minimises the gap at back around rear and centre part walls.
 // We must have a gap somewhere, for co,pletely square pieces to work.
 
@@ -104,7 +107,7 @@ helper_circle_enable = true;
 helper_circle_radius = 1.5;
 helper_circle_depth = 0.3;
 
-no_y_gap_fix_enabled = false;
+no_y_gap_fix_enabled = true;
 
 module main(doing_front_piece = true, miss_centre_beam_angles = [], miss_quarter_cut_angles = []) {
     
@@ -114,13 +117,21 @@ module main(doing_front_piece = true, miss_centre_beam_angles = [], miss_quarter
 
     difference() {
         base_for_cutting(doing_front_piece);
-
+        
         // cuts
         for (rot = [0 : 90 : 270]) {
             rotate([0, 0, rot]) {
+        
                 // cut for the upright shelf gripper (v visible ones)
                 if (!in_array(rot, miss_centre_beam_angles)) {
                     translate([- T_1 / 2, (x - T_1) / 2 + d, c + use_y_offs])                            cube([T_1, inf, inf]);
+                }
+
+                // the 4 cutaways in base (more hidden)
+                // big corner cut
+                if (!doing_front_piece && !in_array(rot, miss_quarter_cut_angles)) {
+                    translate([d, d, c - G])
+                        cube([inf, inf, T_2]);
                 }
 
                 translate([0, 0, height]) {
@@ -135,29 +146,43 @@ module main(doing_front_piece = true, miss_centre_beam_angles = [], miss_quarter
                             cube([inf, inf, inf]);
                 }
                 
-                // the 4 cutaways in base (more hidden)
-                // big corner cut
-                if (!doing_front_piece && !in_array(rot, miss_quarter_cut_angles)) {
-                    translate([d, d, c - G])
-                        cube([inf, inf, T_2]);
-                }
-                
                 // little notch in the 45 degree slope
                 translate([- inf / 2, T_1b / 2 + pp, height + pp])
                     cube([inf, inf, inf]);
-                
+                                
                 // reduction cut similar to notch further after corner cut
                 
 //                translate([(T_1b + f)/2, (T_1b + f)/2, 0])
 //                    cube(30);
             }
-        }  
+        }
+    }     
+    // pillars
+    if (no_y_gap_fix_enabled && !doing_front_piece) {
+        for (rot = [0 : 90 : 270]) {
+            rotate([0, 0, rot]) {
+                translate([T_1 / 2, T_1 / 2, 0])
+                    quarter_cylinder(T_2b - eps, pillar_radius);
+            }
+        }
+    }
        
-        // helper circle on front/back face
-        // (TODO two circles for back, one for front?)
-        translate([0, 0, -eps])
-            cylinder(h = helper_circle_depth + eps, r = helper_circle_radius, $fn = 16);
-    }    
+    // helper circle on front/back face
+    // (TODO two circles for back, one for front?)
+    translate([0, 0, -eps])
+        quarter_cylinder(h = helper_circle_depth + eps, r = helper_circle_radius);
+}
+
+module quarter_cylinder(h, r) {
+    difference() {
+        cylinder(h, r = r, $fn = 16);
+        translate([-inf/2, 0, 0])
+            scale([1, -1, 1])
+                cube([inf, inf, h + eps]);
+        translate([0, -inf/2, 0])
+            scale([-1, 1, 1])
+                cube([inf, inf, h + eps]);
+    }
 }
 
 piece_tx = 24;
