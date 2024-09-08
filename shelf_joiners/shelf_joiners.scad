@@ -30,7 +30,7 @@ d = 1;
 
 
 // support pillars for 'no Y gap' design
-pillar_radius = 3.5;
+pillar_radius = 3.75;
         
 // minimises the gap at back around rear and centre part walls.
 // We must have a gap somewhere, for co,pletely square pieces to work.
@@ -113,9 +113,13 @@ helper_circle_depth = 0.3;
 
 module main(doing_front_piece = true, miss_centre_beam_angles = [], miss_quarter_cut_angles = [], no_y_gap_fix_enabled = true) {
     
-    height = doing_front_piece ?  base_part_height_for_front_pieces : base_part_height;
+    height = doing_front_piece
+        ? base_part_height_for_front_pieces
+        : base_part_height;
          
-    use_y_offs = doing_front_piece ? 0 :     no_y_gap_fix_enabled ? T_2 / 2 + d : T_2 + 0.75;
+    use_y_offs = doing_front_piece
+        ? 0 
+        : no_y_gap_fix_enabled ? T_2 / 2 + d : T_2 + 0.75;
     
     difference() {
         base_for_cutting(doing_front_piece);
@@ -130,23 +134,24 @@ module main(doing_front_piece = true, miss_centre_beam_angles = [], miss_quarter
                         cube([T_1, inf, inf]);
                 }
 
-                // the 4 cutaways in base (more hidden)
-                // big corner cut
-                if (!doing_front_piece && !in_array(rot, miss_quarter_cut_angles)) {
-                    translate([d, d, c - G])
-                        cube([inf, inf, T_2]);
-                }
-
                 translate([0, 0, height]) {
+                    
                     // big corner cut
 //                    corner_cut_y_trans = in_array(rot, miss_vertical_holder_angles) ? -inf/2 : x - eps;
                     
-                    translate([x - eps, x - eps, 0])
+                    translate([x - eps, x - eps, doing_front_piece ? -c-eps : 0])
                         cube(inf);
                     // slope cut at 45 deg
                     translate([-inf/2, x, f])
                         rotate([-45, 0, 0])
                             cube([inf, inf, inf]);
+                }
+
+                // the 4 cutaways in base (more hidden)
+                // big corner cut
+                if (!doing_front_piece && !in_array(rot, miss_quarter_cut_angles)) {
+                    translate([d, d, c - G])
+                        cube([inf, inf, T_2]);
                 }
                 
                 // little notch in the 45 degree slope
@@ -226,26 +231,26 @@ piece_tx = 24;
 
 module all_pieces(doing_front_piece = true, no_y_gap_fix_enabled = true) {
     
-    translate([0, doing_front_piece ? 0 : piece_tx, 0]) {
-        // piece 1 (entire piece)
+//    translate([0, doing_front_piece ? 0 : piece_tx, 0]) {
+        // piece 1 (entire piece) - most common
         translate([-piece_tx, 0, -eps])
             main(doing_front_piece, no_y_gap_fix_enabled = no_y_gap_fix_enabled);
 
-        // piece 2 (two quadrants)
+        // piece 2 (two quadrants) - next most common
         intersection() {
             main(doing_front_piece, miss_centre_beam_angles = [90], miss_quarter_cut_angles = [90, 180], no_y_gap_fix_enabled = no_y_gap_fix_enabled);
             translate([-T_1b / 2, -inf/2, 0])
                 cube(inf);
         }
 
-    // piece 3 (one quadrant)
+    // piece 3 (one quadrant) - most rare
     translate([piece_tx, 0, -eps])
         intersection() {
             main(doing_front_piece, miss_centre_beam_angles = [90, 180], miss_quarter_cut_angles = [90, 180, 270], no_y_gap_fix_enabled = no_y_gap_fix_enabled);
             translate([-T_1b / 2, -T_1b / 2, 0])
                 cube(inf);
         }
-    }
+//    }
 }
 
 
@@ -306,13 +311,15 @@ module do_panels() {
 
 
 // main execution
-all_pieces(doing_front_piece = false, no_y_gap_fix_enabled = true);
-all_pieces(doing_front_piece = true, no_y_gap_fix_enabled = false);
+//all_pieces(doing_front_piece = false, no_y_gap_fix_enabled = true);
 
-translate([0, -50, 0]) 
-    all_pieces(doing_front_piece = false, no_y_gap_fix_enabled = false);
+translate([0, piece_tx, 0])
+    all_pieces(doing_front_piece = true, no_y_gap_fix_enabled = false);
 
-do_panels();
+//translate([0, -piece_tx, 0]) 
+//    all_pieces(doing_front_piece = false, no_y_gap_fix_enabled = false);
+
+//do_panels();
 
 // helpers
     
