@@ -107,7 +107,6 @@ helper_circle_enable = true;
 helper_circle_radius = 1.5;
 helper_circle_depth = 0.3;
 
-//no_y_gap_fix_enabled = true;
 
 module main(doing_front_piece = true, miss_centre_beam_angles = [], miss_quarter_cut_angles = [], no_y_gap_fix_enabled = true) {
     
@@ -159,23 +158,22 @@ module main(doing_front_piece = true, miss_centre_beam_angles = [], miss_quarter
                                 height + slope_cut_in_spare])
                         cube([inf, inf, inf]);
                 }
-                
-                // reduction cut similar to notch further after corner cut
-                
-//                translate([(T_1b + f)/2, (T_1b + f)/2, 0])
-//                    cube(30);
             }
         }
         
-
-        
+        // helper circle on front/back face
+        //  -- this isn't really needed now! It's obvious which of the parts
+        // are front or back due to the cut-aways on the 45 arm bits.
+        // (TODO two circles for back, one for front?)
+//        translate([0, 0, -eps])
+//            cylinder(h = helper_circle_depth + eps, r = helper_circle_radius, $fn = circle_segs);
     }     
     // pillars
     if (no_y_gap_fix_enabled && !doing_front_piece) {
         for (rot = [0 : 90 : 270]) {
             rotate([0, 0, rot]) {
                 translate([T_1 / 2, T_1 / 2, 0])
-                    quarter_cylinder(T_2b - eps, pillar_radius);
+                    quarter_cylinder(T_2b - eps, pillar_radius, res = 4);
             }
         }
     }
@@ -190,11 +188,6 @@ module main(doing_front_piece = true, miss_centre_beam_angles = [], miss_quarter
             }
         }
     }
-    
-    // helper circle on front/back face
-    // (TODO two circles for back, one for front?)
-    translate([0, 0, -eps])
-        quarter_cylinder(h = helper_circle_depth + eps, r = helper_circle_radius);
 }
 
 module cylinder_hollow(h, rd, thickness) {
@@ -217,9 +210,9 @@ circle_segs = 32;
 
 support_cyl_thickness = 0.4;
 
-module quarter_cylinder(h, r) {
+module quarter_cylinder(h, r, res = circle_segs) {
     difference() {
-        cylinder(h, r = r, $fn = circle_segs);
+        cylinder(h, r = r, $fn = res);
         translate([-inf/2, 0, 0])
             scale([1, -1, 1])
                 cube([inf, inf, h + eps]);
