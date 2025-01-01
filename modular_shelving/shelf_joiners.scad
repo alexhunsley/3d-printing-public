@@ -311,11 +311,14 @@ module do_panels() {
     }
 }
 
+// the 'front piece' is the back wall. without it, the shelves are 'holey' front to back.
 translate([0, piece_tx, 0])
-    all_pieces(doing_front_piece = true, no_y_gap_fix_enabled = false);
+    all_pieces(doing_front_piece = false, no_y_gap_fix_enabled = true);
 
 
-//do_panels();
+// logic
+
+function piece_counts(shelf_x_holes, shelf_y_holes) = [1, 2];
 
 // helpers
     
