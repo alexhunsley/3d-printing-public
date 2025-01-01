@@ -33,7 +33,7 @@ d = 1;
 pillar_radius = 3.75;
         
 // minimises the gap at back around rear and centre part walls.
-// We must have a gap somewhere, for co,pletely square pieces to work.
+// We must have a gap somewhere, for completely square pieces to work.
 
 // wood (shelf) thickness
 W = 2.8;
@@ -43,12 +43,12 @@ W = 2.8;
 G = -0.1;
 
 // protrusion of the arm grippers away from centre
-f = 7.75;
+f = 12.0;
 
 // 'nobble' grip radius
-r = 0; // impl later
+//r = 0; // impl later
 // 'nobble' sticking out amount
-K = 0; // impl later
+K = 0; // impl later, but this var is used currently
 
 T_1 = 2 * (K + G) + W;
 T_2 = 2 * G + W;
@@ -72,9 +72,15 @@ x = T_1b / 2;
 y = f + T_1b / 2;
 
 
+// grip travel from body.
+// this limits our grip to being cut away this amount from the wall.
+// To reduce print time.
+// To disable, set to 0.
+enable_slope_cut = true;
 
-// amount we cut into the 45 degree slopes
-slope_cut_in = 2;
+// amount we spare with a cut into the 45 degree slopes
+slope_cut_in_spare = 3;
+
 
 oct_poly_coords = [
                     [x, y], [y, x],
@@ -95,14 +101,6 @@ module base_for_cutting(doing_front_piece = true) {
         polygon(oct_poly_coords);
     }
 }
-
-// grip travel from body.
-// this limits our grip to being cut away this amount from the wall.
-// To reduce print time.
-// To disable, set to 0.
-enable_slope_cut = false;
-
-pp = enable_slope_cut ? 2 : f;
 
 // de-confusion helper: cuts a circle on the side that should face up or down in final construction
 helper_circle_enable = true;
@@ -155,9 +153,13 @@ module main(doing_front_piece = true, miss_centre_beam_angles = [], miss_quarter
                 }
                 
                 // little notch in the 45 degree slope
-                translate([- inf / 2, T_1b / 2 + pp, height + pp])
-                    cube([inf, inf, inf]);
-                                
+                if (enable_slope_cut) {
+                    translate([- inf / 2,
+                                T_1b / 2 + slope_cut_in_spare,
+                                height + slope_cut_in_spare])
+                        cube([inf, inf, inf]);
+                }
+                
                 // reduction cut similar to notch further after corner cut
                 
 //                translate([(T_1b + f)/2, (T_1b + f)/2, 0])
@@ -309,15 +311,9 @@ module do_panels() {
     }
 }
 
-
-// main execution
-//all_pieces(doing_front_piece = false, no_y_gap_fix_enabled = true);
-
 translate([0, piece_tx, 0])
     all_pieces(doing_front_piece = true, no_y_gap_fix_enabled = false);
 
-//translate([0, -piece_tx, 0]) 
-//    all_pieces(doing_front_piece = false, no_y_gap_fix_enabled = false);
 
 //do_panels();
 
