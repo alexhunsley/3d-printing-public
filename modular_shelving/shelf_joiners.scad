@@ -5,9 +5,6 @@
 // Based on the shelf joining piece in the set I bought online
 //
 
-// pergola (Gordon)
-//
-
 // measurement params are per page 6 on my green notebook 2024-05-27
 // See screenshot "shelf_joiners_design_and_parameters.jpg"
 //
@@ -20,27 +17,29 @@ inf = 50;
 eps = 0.001;
 
 // thickness of 'wood grasping' parts
-a = 1.5;
+a = 2;
 
 // base z thicknesses
-b = 1.25;
-c = 1.5;
+b = 1.5;
+c = 1.75;
 
-d = 1;
+d = 1.2;
 
+// this gap is oriented vertically when printed so need a little more space
+extra_gap_for_back_space = 0.25;
 
 // support pillars for 'no Y gap' design
+// (minimises the gap at back around rear and centre part walls.
+// We must have a gap somewhere, for completely square pieces to work)
 pillar_radius = 7;
-        
-// minimises the gap at back around rear and centre part walls.
-// We must have a gap somewhere, for completely square pieces to work.
 
 // wood (shelf) thickness
-W = 2.8;
-//W = 0.9;
+//W = 2.8;
+W = 3.0;
 
 // gap between shelf and 'grasping' wall (on just one side)
-G = -0.1;
+G = -0.2;
+//G = 1.0;
 
 // protrusion of the arm grippers away from centre
 f = 12.0;
@@ -51,7 +50,7 @@ f = 12.0;
 K = 0; // impl later, but this var is used currently
 
 T_1 = 2 * (K + G) + W;
-T_2 = 2 * G + W;
+T_2 = 2 * G + W  + extra_gap_for_back_space;
 
 // same but including the 'grasping' walls
 T_1b = T_1 + 2 * a;
@@ -62,7 +61,6 @@ oct_short_edge = T_1 + 2 * a;
 
 // base 'height' before bits go inwards at 45 deg
 e = c + T_2 + b;
-
 
 base_part_height = T_2b;
 base_part_height_for_front_pieces = b;
