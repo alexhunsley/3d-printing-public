@@ -132,10 +132,7 @@ module main(doing_front_piece = true, miss_centre_beam_angles = [], miss_quarter
                 }
 
                 translate([0, 0, height]) {
-                    
-                    // big corner cut
-//                    corner_cut_y_trans = in_array(rot, miss_vertical_holder_angles) ? -inf/2 : x - eps;
-                    
+                                        
                     translate([x - eps, x - eps, doing_front_piece ? -c-eps : 0])
                         cube(inf);
                     // slope cut at 45 deg
@@ -192,26 +189,28 @@ module main(doing_front_piece = true, miss_centre_beam_angles = [], miss_quarter
 //    }
 }
 
-module cylinder_hollow(h, rd, thickness) {
-    difference() {
-        translate([0, 0, -eps])
-            cylinder(h, r = rd, $fn = 16);
-            cylinder(h, r = rd - thickness, $fn = 16);
-    }
-}
+//module cylinder_hollow(h, rd, thickness) {
+//    difference() {
+//        translate([0, 0, -eps])
+//            cylinder(h, r = rd, $fn = 16);
+//            cylinder(h, r = rd - thickness, $fn = 16);
+//    }
+//}
 
-// import                                                               §§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§pl currently commented out, see above
-enable_support = false;
-
+//support_cyl_thickness = 0.4;
+//
+//// the temp support (to avoid having to do it repeatedly in prusa slicer):
+//suport_cyl_r2 = 2.2;
+//
 // why will these 'support' cylinders not stick to the pieces?! They're free roaming when I do arrange.
-support_cylinder_offset_dist = 5.05;
+//support_cylinder_offset_dist = 5.05;
+//
+// code for this currently commented out, see above
+// enable_support = false;
 
-// the temp support (to avoid having to do it repeatedly in prusa slicer):
-suport_cyl_r2 = 2.2;
 
+piece_tx = 24;
 circle_segs = 32;
-
-support_cyl_thickness = 0.4;
 
 module quarter_cylinder(h, r, res = circle_segs) {
     difference() {
@@ -225,7 +224,6 @@ module quarter_cylinder(h, r, res = circle_segs) {
     }
 }
 
-piece_tx = 24;
 
 module all_pieces(doing_front_piece = true, no_y_gap_fix_enabled = true, piece_counts = [1,1,1], piece_mult = 1) {
     displace = 32;
@@ -269,7 +267,8 @@ module all_pieces(doing_front_piece = true, no_y_gap_fix_enabled = true, piece_c
 //
 // For niceness, the user-facing pieces don't need a gap where that face is missing.
 // So we need a version of all three pieces without those gap(s), so six pieces in all.
-
+//   -- this isn't necessary now, I think, due to us cutting a bit out of the 45 degree
+//      slopes.
 
 // piece 4 (one quadrant, only one upright holder, not two -- for front corner (open shelf))
 
@@ -297,38 +296,13 @@ panel_thickness = W;
 // a little give to help rotating and slotting in the panels
 pillar_gap = 0.3;
 
-module do_panels() {
-    for (panel_index = [1 : 5]) {
-        translate([(panel_size + 2) * (panel_index - 0.25), 0, 0])
-            difference() {
-                cube([panel_size, panel_size, panel_thickness]);
-                // only need one notched back panel per set of panels
-                if (panel_index == 1) {
-                    union() {
-                        translate([0, 0, -eps])
-                            cylinder(panel_thickness + eps * 2, r = pillar_radius + pillar_gap, $fn = circle_segs);
-                        translate([panel_size, 0, -eps])
-                            cylinder(panel_thickness + eps * 2, r = pillar_radius + pillar_gap, $fn = circle_segs);
-                        translate([panel_size, panel_size, -eps])
-                            cylinder(panel_thickness + eps * 2, r = pillar_radius + pillar_gap, $fn = circle_segs);
-                        translate([0, panel_size, -eps])
-                            cylinder(panel_thickness + eps * 2, r = pillar_radius + pillar_gap, $fn = circle_segs);
-                    }
-                }
-            }
-    }
-}
-
-// the 'front piece' is the back wall. without it, the shelves are 'holey' front to back.
 translate([0, piece_tx, 0])
-    // piece_mult = 2 os have front and back pieces
+    // piece_mult = 2 doos both front and back pieces
     all_pieces(doing_front_piece = false,
                 no_y_gap_fix_enabled = true,
-                piece_counts = piece_counts(3, 2),
-                piece_mult = 2);
+                piece_counts = piece_counts(1, 1),
+                piece_mult = 1);
 
-
-// logic
 
 function piece_counts(shelf_x_holes, shelf_y_holes)
     = [4,
@@ -339,4 +313,26 @@ function piece_counts(shelf_x_holes, shelf_y_holes)
     
 function in_array(value, arr) = len(search(value, arr)) > 0;
 
-
+//do_panels();
+//
+//module do_panels() {
+//    for (panel_index = [1 : 5]) {
+//        translate([(panel_size + 2) * (panel_index - 0.25), 0, 0])
+//            difference() {
+//                cube([panel_size, panel_size, panel_thickness]);
+//                // only need one notched back panel per set of panels
+//                if (panel_index == 1) {
+//                    union() {
+//                        translate([0, 0, -eps])
+//                            cylinder(panel_thickness + eps * 2, r = pillar_radius + pillar_gap, $fn = circle_segs);
+//                        translate([panel_size, 0, -eps])
+//                            cylinder(panel_thickness + eps * 2, r = pillar_radius + pillar_gap, $fn = circle_segs);
+//                        translate([panel_size, panel_size, -eps])
+//                            cylinder(panel_thickness + eps * 2, r = pillar_radius + pillar_gap, $fn = circle_segs);
+//                        translate([0, panel_size, -eps])
+//                            cylinder(panel_thickness + eps * 2, r = pillar_radius + pillar_gap, $fn = circle_segs);
+//                    }
+//                }
+//            }
+//    }
+//}
