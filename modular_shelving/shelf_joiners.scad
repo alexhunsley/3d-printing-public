@@ -30,7 +30,7 @@ d = 1;
 
 
 // support pillars for 'no Y gap' design
-pillar_radius = 3.75;
+pillar_radius = 7;
         
 // minimises the gap at back around rear and centre part walls.
 // We must have a gap somewhere, for completely square pieces to work.
@@ -209,7 +209,8 @@ module main(doing_front_piece = true, miss_centre_beam_angles = [], miss_quarter
 // enable_support = false;
 
 
-piece_tx = 24;
+piece_tx = 36;
+piece_tx_front_back = 17;
 circle_segs = 32;
 
 module quarter_cylinder(h, r, res = circle_segs) {
@@ -225,20 +226,20 @@ module quarter_cylinder(h, r, res = circle_segs) {
 }
 
 
-module all_pieces(doing_front_piece = true, no_y_gap_fix_enabled = true, piece_counts = [1,1,1], piece_mult = 1) {
+module all_pieces(doing_front_piece, no_y_gap_fix_enabled = true, piece_counts) {
     displace = 32;
-    echo(piece_counts);
+    echo("Piece counts:", piece_counts);
     
 //    translate([0, doing_front_piece ? 0 : piece_tx, 0]) {
         // piece 1 (entire piece) - most common
     if (piece_counts[2] > 0)
-        for (p1 = [0 : piece_mult * piece_counts[2] - 1]) {
-            translate([-piece_tx, p1 * displace, -eps])
+        for (p1 = [0 : piece_counts[2] - 1]) {
+            translate([2*piece_tx, p1 * displace, -eps])
                 main(doing_front_piece, no_y_gap_fix_enabled = no_y_gap_fix_enabled);
         }
     
     if (piece_counts[1] > 0)
-        for (p2 = [0 : piece_mult * piece_counts[1] -1]) {
+        for (p2 = [0 : piece_counts[1] -1]) {
             // piece 2 (two quadrants) - next most common
             translate([0, p2 * displace, 0]) {
                 intersection() {
@@ -250,9 +251,9 @@ module all_pieces(doing_front_piece = true, no_y_gap_fix_enabled = true, piece_c
         }
 
     if (piece_counts[0] > 0)
-        for (p3 = [0 : piece_mult * piece_counts[0] - 1]) {
+        for (p3 = [0 : piece_counts[0] - 1]) {
             // piece 3 (one quadrant) - most rare
-            translate([piece_tx, p3 * displace, -eps])
+            translate([-2*piece_tx, p3 * displace, -eps])
                 intersection() {
                     main(doing_front_piece, miss_centre_beam_angles = [90, 180], miss_quarter_cut_angles = [90, 180, 270], no_y_gap_fix_enabled = no_y_gap_fix_enabled);
                     translate([-T_1b / 2, -T_1b / 2, 0])
@@ -261,6 +262,13 @@ module all_pieces(doing_front_piece = true, no_y_gap_fix_enabled = true, piece_c
         }
 }
 
+module all_pieces_front_and_back(no_y_gap_fix_enabled = true, piece_counts) {
+//    translate([piece_tx_front_back, 0, 0])
+        color("#AAA")
+            all_pieces(doing_front_piece = true, no_y_gap_fix_enabled = true, piece_counts = piece_counts);
+    translate([-piece_tx_front_back*1.9, 0, 0])
+        all_pieces(doing_front_piece = false, no_y_gap_fix_enabled = true, piece_counts = piece_counts);
+}
 
 // We only strictly need THREE pieces!
 // As long as the big flat side is facing the the user or the rear of the shelf, it works.
@@ -296,18 +304,45 @@ panel_thickness = W;
 // a little give to help rotating and slotting in the panels
 pillar_gap = 0.3;
 
-translate([0, piece_tx, 0])
-    // piece_mult = 2 doos both front and back pieces
-    all_pieces(doing_front_piece = false,
-                no_y_gap_fix_enabled = true,
-                piece_counts = piece_counts(1, 1),
-                piece_mult = 1);
+//piece_c = piece_counts(2, 2);
+piece_c = [0, 0, 2];
 
+// piece_mult = 2 does both front and back pieces
+rotate([0, 0, -90]) {
+    all_pieces_front_and_back(true, piece_c);
+    guide_letters();
+}
 
-function piece_counts(shelf_x_holes, shelf_y_holes)
+module guide_letters() {
+    color("red") {
+        translate([0, -45, 0]) {
+            translate([7, 0, 0]) {
+                rotate([0, 0, 90])
+                    text("T", 40, halign="center");  
+            }
+            translate([75, 0, 0]) {
+                rotate([0, 0, 90])
+                    text("X", 40, halign="center");  
+            }
+            translate([-63, 0, 0]) {
+                rotate([0, 0, 90])
+                    text("L", 40, halign="center");  
+            }
+        }      
+    }
+    translate([120, -60, 0]) {
+        rotate([0, 0, 90]) {
+            text("Grey: front pieces", 20);
+            translate([0, -28, 0])
+                text("Green: back pieces", 20);
+        }
+    }
+}
+
+function piece_counts(shelf_x_holes, shelf_y_holes) // = [1, 1, 2];
     = [4,
-    2 * (shelf_x_holes + shelf_y_holes) - 4,
-    (shelf_x_holes-1) * (shelf_y_holes-1)];
+       2 * (shelf_x_holes + shelf_y_holes) - 4,
+       (shelf_x_holes-1) * (shelf_y_holes-1)];
 
 // helpers
     
