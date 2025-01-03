@@ -23,10 +23,11 @@ a = 2;
 b = 1.5;
 c = 1.75;
 
-d = 1.2;
+d = 1.5;
 
 // this gap is oriented vertically when printed so need a little more space
-extra_gap_for_back_space = 0.25;
+//extra_gap_for_back_space = 0.25;
+extra_gap_for_back_space = 0.1;
 
 // support pillars for 'no Y gap' design
 // (minimises the gap at back around rear and centre part walls.
@@ -35,7 +36,7 @@ pillar_radius = 7;
 
 // wood (shelf) thickness
 //W = 2.8;
-W = 3.0;
+W = 3.25;
 
 // gap between shelf and 'grasping' wall (on just one side)
 G = -0.2;
@@ -164,10 +165,11 @@ module main(doing_front_piece = true, miss_centre_beam_angles = [], miss_quarter
 //            cylinder(h = helper_circle_depth + eps, r = helper_circle_radius, $fn = circle_segs);
     }     
     // pillars
+    pillar_into_wall = eps;
     if (no_y_gap_fix_enabled && !doing_front_piece) {
         for (rot = [0 : 90 : 270]) {
             rotate([0, 0, rot]) {
-                translate([T_1 / 2, T_1 / 2, 0])
+                translate([d - pillar_into_wall, d - pillar_into_wall, 0])
                     quarter_cylinder(T_2b - eps, pillar_radius, res = 4);
             }
         }
@@ -303,7 +305,7 @@ panel_thickness = W;
 pillar_gap = 0.3;
 
 //piece_c = piece_counts(2, 2);
-piece_c = [0, 0, 2];
+piece_c = [0, 0, 1];
 
 // piece_mult = 2 does both front and back pieces
 rotate([0, 0, -90]) {
