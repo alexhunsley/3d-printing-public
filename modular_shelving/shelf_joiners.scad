@@ -17,17 +17,19 @@ inf = 50;
 eps = 0.001;
 
 // thickness of 'wood grasping' parts
-a = 2;
+//a = 2;
+a = 1.5;
 
 // base z thicknesses
-b = 1.5;
-c = 1.75;
+b = 1.25;
+c = 1.5;
 
 d = 1.5;
 
 // this gap is oriented vertically when printed so need a little more space
 //extra_gap_for_back_space = 0.25;
-extra_gap_for_back_space = 0.1;
+//extra_gap_for_back_space = 0.1;
+extra_gap_for_back_space = 0;
 
 // support pillars for 'no Y gap' design
 // (minimises the gap at back around rear and centre part walls.
@@ -70,6 +72,7 @@ base_part_height_for_front_pieces = b;
 x = T_1b / 2;
 y = f + T_1b / 2;
 
+centre_radius = 2.5;
 
 // grip travel from body.
 // this limits our grip to being cut away this amount from the wall.
@@ -78,7 +81,8 @@ y = f + T_1b / 2;
 enable_slope_cut = true;
 
 // amount we spare with a cut into the 45 degree slopes
-slope_cut_in_spare = 3;
+//slope_cut_in_spare = 2.5;
+slope_cut_in_spare = 3.0;
 
 
 oct_poly_coords = [
@@ -133,7 +137,12 @@ module main(doing_front_piece = true, miss_centre_beam_angles = [], miss_quarter
                 translate([0, 0, height]) {
                                         
                     translate([x - eps, x - eps, doing_front_piece ? -c-eps : 0])
-                        cube(inf);
+                        difference() {
+                            cube(inf);
+                            cyl_height = f + (doing_front_piece ? c : 0);
+                            cylinder(cyl_height, centre_radius, centre_radius, $fn = circle_segs);
+                        }
+//                        cube([2, 2, 100]);
                     // slope cut at 45 deg
                     translate([-inf/2, x, f])
                         rotate([-45, 0, 0])
@@ -147,11 +156,11 @@ module main(doing_front_piece = true, miss_centre_beam_angles = [], miss_quarter
                         cube([inf, inf, T_2]);
                 }
                 
-                // little notch in the 45 degree slope
+                // little notch in the 45 degree slope cut
                 if (enable_slope_cut) {
                     translate([- inf / 2,
                                 T_1b / 2 + slope_cut_in_spare,
-                                height + slope_cut_in_spare])
+                                height + slope_cut_in_spare - (doing_front_piece ? 0 : b)])
                         cube([inf, inf, inf]);
                 }
             }
@@ -304,10 +313,18 @@ panel_thickness = W;
 // a little give to help rotating and slotting in the panels
 pillar_gap = 0.3;
 
-//piece_c = piece_counts(2, 2);
-piece_c = [0, 0, 1];
+//piece_c = piece_counts(5, 4);
 
+// (5, 4) needs [4, 14, 12] of LTX.
+// Already got 4 L.
+//
+// So need [0, 14, 12].
+//piece_c = [0, 4, 06];
+//
 // piece_mult = 2 does both front and back pieces
+
+piece_c = [1, 1, 1];
+
 rotate([0, 0, -90]) {
     all_pieces_front_and_back(true, piece_c);
     guide_letters();
