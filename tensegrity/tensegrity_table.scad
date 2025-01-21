@@ -26,10 +26,21 @@ rope_thickness = 1;
 // clearance between the bottom and top table surfaces
 table_vert_gap = 2*vert_part_len - rope_length;
 
-// -90 gives you the Ls going at 90 degs to each other
+// 0 is typical design (symmetry)
+// 90 for right angle
+// 135 for almost touching and coming from similar angle
 top_L_rot = 135;
 
-module main() {
+offset = table_base_dim + 50;
+
+L_rots = [0, 90, 135];
+
+for (index = [0 : len(L_rots)-1]) {
+    translate([offset * index, 0, 0])
+        main(L_rots[index]);
+}
+
+module main(top_L_rot = 0) {
     // table bottom
     half_part(draw_ropes = true);
 
@@ -37,8 +48,6 @@ module main() {
     scale([-1, 1, -1])
         half_part(top_L_rot = top_L_rot);
 }
-
-main();
 
 module rope(length) {
     color("cyan")
