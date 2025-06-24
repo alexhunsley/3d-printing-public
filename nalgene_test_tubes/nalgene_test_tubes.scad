@@ -43,7 +43,7 @@ difference() {
     if (show_cutaway) {
         translate([0, -50, -1])
             cube(100, center=true);
-        // uncoomment this to get very thin slice
+// uncoomment this to get very thin slice
 //        translate([0, 50 + 1, -1])
 //            cube(100, center=true);
     }
@@ -57,12 +57,9 @@ module main(fit_in_place=false) {
             cylinder(tube_height, radius - wall_thickness*2, radius - wall_thickness*2, $fn = res);
     }
     
-    
     for (lid_idx = [0 : 0]) {
-//        use_gap = 0.02 * lid_idx;
         use_gap = -0.025 + 0.005 * lid_idx;
         
-        // lid
         inner_fit_lid_radius = radius - 2*(wall_thickness + use_gap);
         
         x_translate = fit_in_place ? 0 : lid_print_displace * (lid_idx + 1);
@@ -89,7 +86,6 @@ module main(fit_in_place=false) {
                 }
             
             }
-    //        lid_pop_tab_size
         }
     }
 }
