@@ -5,8 +5,8 @@
 // 2mm between holes
 // 47mm verticxal space inside container
 
-//show_cutaway = true;
-show_cutaway = false;
+show_cutaway = true;
+//show_cutaway = false;
 
 //lid_in_place = true;
 lid_in_place = false;
@@ -76,9 +76,9 @@ module main(fit_in_place=false) {
                 // pop lid tabs
                 intersection() {
                     cylinder(lid_height, radius + lid_pop_tab_size, radius + lid_pop_tab_size, $fn = res);
+                    tab_offset = 30;
                     for (rot = [0 : 120 : 240]) {
-                        echo(rot);
-                        rotate([0, 0, rot]) {
+                        rotate([0, 0, rot + tab_offset]) {
                             translate([25, 0, lid_height/2])
                                 cube([50, 4, lid_height], center=true);
                         }
