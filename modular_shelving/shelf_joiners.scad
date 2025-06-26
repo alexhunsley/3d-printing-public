@@ -9,8 +9,6 @@
 // See screenshot "shelf_joiners_design_and_parameters.jpg"
 //
 
-
-
 // a big value for cutaways
 inf = 50;
 
@@ -26,11 +24,6 @@ c = 1.5;
 
 d = 1.5;
 
-// this gap is oriented vertically when printed so need a little more space
-//extra_gap_for_back_space = 0.25;
-//extra_gap_for_back_space = 0.1;
-extra_gap_for_back_space = 0;
-
 // support pillars for 'no Y gap' design
 // (minimises the gap at back around rear and centre part walls.
 // We must have a gap somewhere, for completely square pieces to work)
@@ -45,7 +38,7 @@ G = -0.2;
 //G = 1.0;
 
 // protrusion of the arm grippers away from centre
-f = 12.0;
+f = 10.0;
 
 // 'nobble' grip radius
 //r = 0; // impl later
@@ -53,12 +46,11 @@ f = 12.0;
 K = 0; // impl later, but this var is used currently
 
 T_1 = 2 * (K + G) + W;
-T_2 = 2 * G + W  + extra_gap_for_back_space;
+T_2 = 2 * G + W;
 
 // same but including the 'grasping' walls
 T_1b = T_1 + 2 * a;
 T_2b = T_2 + b + c;
-
 
 oct_short_edge = T_1 + 2 * a;
 
@@ -82,7 +74,7 @@ enable_slope_cut = true;
 
 // amount we spare with a cut into the 45 degree slopes
 //slope_cut_in_spare = 2.5;
-slope_cut_in_spare = 3.0;
+slope_cut_in_spare = 2.5;
 
 
 oct_poly_coords = [
@@ -135,7 +127,6 @@ module main(doing_front_piece = true, miss_centre_beam_angles = [], miss_quarter
                 }
 
                 translate([0, 0, height]) {
-                                        
                     translate([x - eps, x - eps, doing_front_piece ? -c-eps : 0])
                         difference() {
                             cube(inf);
@@ -323,7 +314,7 @@ pillar_gap = 0.3;
 //
 // piece_mult = 2 does both front and back pieces
 
-piece_c = [1, 1, 1];
+piece_c = [1, 8, 4];
 
 rotate([0, 0, -90]) {
     all_pieces_front_and_back(true, piece_c);
