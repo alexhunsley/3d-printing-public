@@ -2,13 +2,26 @@
 
 tube_len = 100;
 tube_radius = 4;
-//tube_res = 32;
 
-tube_res = 4;
-rot_adj_1 = 45;
-rot_adj_2 = 45;
-rot_adj_3 = 45;
-tube_size_adj = sqrt(2);
+tube_res = 32;
+rot_adj_1 = 0;
+rot_adj_2 = 0;
+rot_adj_3 = 0;
+tube_size_adj = 1;
+
+// octagonal
+//tube_res = 8;
+//rot_adj_1 = 22.5;
+//rot_adj_2 = 22.5;
+//rot_adj_3 = 22.5;
+//tube_size_adj = 1/cos(22.5);
+
+
+//tube_res = 4;
+//rot_adj_1 = 45;
+//rot_adj_2 = 45;
+//rot_adj_3 = 45;
+//tube_size_adj = sqrt(2);
 
 //tube_res = 6;
 //rot_adj_1 = 30;
