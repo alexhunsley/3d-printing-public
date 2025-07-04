@@ -83,21 +83,24 @@ module 2d_design(patt_offset=0, patt_offset_inner=0, rot_adj=0) {
     }
 }
 
-translate([-total_size/2, -total_size/2, 0]) {
+// Z axis
+translate([-total_size/2, -total_size/2, tube_radius]) {
     2d_design(patt_offset=0, patt_offset_inner=0, rot_adj=rot_adj_1);
 }
 
+// X axis
 rotate([0, 90, 0]) {
     scale([1, -1, 1])
-    translate([-total_size/2, -total_size/2, -tube_radius*5])
-        2d_design(patt_offset=1, rot_adj=rot_adj_2);
+        translate([-total_size/2, -total_size/2, -tube_radius*5])
+            2d_design(patt_offset=1, rot_adj=rot_adj_2);
 }
 
+// Y axis
 // rot these by 30 for hex hotel!
 rotate([-90, 0, 0]) {
     scale([-1, -1, 1])
-        translate([-total_size/2, -total_size/2, 0]) {
-        translate([5*tube_spacing, 0, 0])
-            2d_design(patt_offset=1, patt_offset_inner=0, rot_adj=rot_adj_3);
+        translate([-total_size/2, -total_size/2, -tube_radius]) {
+            translate([5*tube_spacing, 0, 0])
+                2d_design(patt_offset=1, patt_offset_inner=0, rot_adj=rot_adj_3);
     }
 }
