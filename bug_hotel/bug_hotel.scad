@@ -4,17 +4,17 @@ tube_len = 100;
 tube_radius = 4;
 //tube_res = 32;
 
-//tube_res = 4;
-//rot_adj_1 = 45;
-//rot_adj_2 = 45;
-//rot_adj_3 = 45;
-//tube_size_adj = sqrt(2);
+tube_res = 4;
+rot_adj_1 = 45;
+rot_adj_2 = 45;
+rot_adj_3 = 45;
+tube_size_adj = sqrt(2);
 
-tube_res = 6;
-rot_adj_1 = 30;
-rot_adj_2 = 30;
-rot_adj_3 = 0;
-tube_size_adj = sqrt(3)*2/3;
+//tube_res = 6;
+//rot_adj_1 = 30;
+//rot_adj_2 = 30;
+//rot_adj_3 = 0;
+//tube_size_adj = sqrt(3)*2/3;
 
 tube_wall_thickness = 1.0;
 tube_inner_radius = tube_radius - tube_wall_thickness;
