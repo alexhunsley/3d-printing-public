@@ -2,7 +2,11 @@
 
 tube_len = 100;
 tube_radius = 4;
-tube_res = 32;
+//tube_res = 32;
+
+tube_res = 4;
+tube_rot = 45;
+tube_size_adj = 2*sqrt(2);
 
 tube_wall_thickness = 1.0;
 tube_inner_radius = tube_radius - tube_wall_thickness;
@@ -26,11 +30,14 @@ pattern_len = len(pattern);
 eps = 0.001;
 
 module tube() {
-    difference() {
-        cylinder(tube_len, tube_radius, tube_radius, $fn=tube_res, center=true);
-        translate([0, eps, 0])
-            cylinder(tube_len + 2*eps, tube_inner_radius, tube_inner_radius, $fn=tube_res, center=true);
-        
+    scale(tube_size_adj) {
+        rotate([0, 0, tube_rot]) 
+            difference() {
+                cylinder(tube_len, tube_radius, tube_radius, $fn=tube_res, center=true);
+                translate([0, eps, 0])
+                    cylinder(tube_len + 2*eps, tube_inner_radius, tube_inner_radius, $fn=tube_res, center=true);
+                
+            }
     }
 }
 
