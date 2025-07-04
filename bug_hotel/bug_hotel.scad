@@ -4,13 +4,14 @@ tube_len = 100;
 tube_radius = 4;
 //tube_res = 32;
 
-tube_res = 4;
-tube_rot = 45;
-tube_size_adj = sqrt(2);
+//tube_res = 4;
+//tube_rot = 45;
+//tube_size_adj = sqrt(2);
 
-//tube_res = 32;
-//tube_rot = 0;
-//tube_size_adj = 1;
+tube_res = 6;
+tube_rot = 0;
+tube_size_adj = sqrt(3)*2/3;
+hex_adj = 30;
 
 tube_wall_thickness = 1.0;
 tube_inner_radius = tube_radius - tube_wall_thickness;
@@ -33,8 +34,8 @@ pattern_len = len(pattern);
 
 eps = 0.001;
 
-module tube() {
-    rotate([0, 0, tube_rot]) 
+module tube(rot_adj=tube_rot) {
+    rotate([0, 0, rot_adj]) 
         scale([tube_size_adj, tube_size_adj, 1]) {
             difference() {
                 cylinder(tube_len, tube_radius, tube_radius, $fn=tube_res, center=true);
@@ -44,7 +45,7 @@ module tube() {
         }
 }
 
-module linear_design(patt_offset_inner=0) {
+module linear_design(patt_offset_inner=0, rot_adj=tube_rot) {
     for (idx = [0 : grid_repeats - 1]) {
 //        idx = 0;
         translate([idx * grid_mult * tube_spacing, 0, 0]) {
@@ -56,14 +57,14 @@ module linear_design(patt_offset_inner=0) {
     //                echo("Checking index: ", patt_idx, " found: ", pattern[patt_idx]);
                 if (pattern[ii] == 1) {
                     translate([i * tube_spacing, 0, 0])
-                        tube();
+                        tube(rot_adj);
                 }
             }
         }
     }
 }
 
-module 2d_design(patt_offset=0, patt_offset_inner=0) {
+module 2d_design(patt_offset=0, patt_offset_inner=0, rot_adj=0) {
     for (idx = [0 : grid_repeats - 1]) {
         translate([0, idx * grid_mult * tube_spacing, 0]) {
 //            for (i = [patt_offset : pattern_len - 1 + patt_offset]) {
@@ -72,7 +73,7 @@ module 2d_design(patt_offset=0, patt_offset_inner=0) {
 //                echo("Checking index: ", patt_idx, " found: ", pattern[patt_idx]);
                 if (pattern[patt_idx] == 1) {
                     translate([0, i * tube_spacing, 0])
-                        linear_design(patt_offset_inner);
+                        linear_design(patt_offset_inner, rot_adj);
                 }
             }
         }
@@ -80,17 +81,16 @@ module 2d_design(patt_offset=0, patt_offset_inner=0) {
 }
 
 translate([-total_size/2, -total_size/2, 0]) {
-    2d_design(patt_offset=0, patt_offset_inner=0);
+    2d_design(patt_offset=0, patt_offset_inner=0, rot_adj=hex_adj);
 }
 
 rotate([0, 90, 0]) {
     scale([1, -1, 1])
     translate([-total_size/2, -total_size/2, -tube_radius*5])
-        2d_design(patt_offset=1);
+        2d_design(patt_offset=1, rot_adj=hex_adj);
 }
-//
-//
-//translate([0, 50, 0])
+
+// rot these by 30 for hex hotel!
 rotate([-90, 0, 0]) {
     scale([-1, -1, 1])
         translate([-total_size/2, -total_size/2, 0]) {
