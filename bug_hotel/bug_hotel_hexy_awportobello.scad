@@ -5,7 +5,7 @@ wall_thickness = 1;
 height = 40;
 corner_radius = wall_thickness / 2 + 0.1;
 
-grid_size_x = 16;
+grid_size_x = 24;
 grid_size_y = 4;
 //grid_size_x = 2;
 //grid_size_y = 2;
@@ -20,7 +20,8 @@ points = [ for(i = [0:5]) [
 // 1.1 = 10% limit
 
 // do values > 1 like 2, 3.
-no_tx_percentage_edge = 3.0;
+// 1 means no edge limits to transformation (it begins immediately)
+no_tx_percentage_edge = 1.4;
 
 //echo(clamped_tx_percentage(0.0));
 //echo(clamped_tx_percentage(0.1));
@@ -57,7 +58,7 @@ function pointsy(x, y) =
     [ for(i = [2:5]) [ 
 //        (radius - x / 1) * cos(60 * i),
 //        (radius - x / 1) * sin(60 * i)
-        radius2 * cos(60 * i) + ((i % 2) == 0 ? -1 : 1) * (radius * 2 * sqrt(2.0)/3.0) * transform_percentage((x+ (i == 5 ? 1 : 0)), i),
+        radius2 * cos(60 * i) + ((i % 2) == 0 ? 1 : -1) * (radius * 2 * sqrt(2.0)/3.0) * transform_percentage((x+ (i == 5 ? 1 : 0)), i),
         radius2 * sin(60 * i)
     ]];
 
