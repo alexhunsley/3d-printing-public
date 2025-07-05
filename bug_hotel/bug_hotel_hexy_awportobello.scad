@@ -58,7 +58,7 @@ function pointsy(x, y) =
     [ for(i = [2:5]) [ 
 //        (radius - x / 1) * cos(60 * i),
 //        (radius - x / 1) * sin(60 * i)
-        radius2 * cos(60 * i) + ((i % 2) == 0 ? 1 : -1) * (radius * 2 * sqrt(2.0)/3.0) * transform_percentage((x+ (i == 5 ? 1 : 0)), i),
+        radius2 * cos(60 * i) - ((i % 2) == 0 ? 1 : -1) * (radius * sqrt(2.0)/3.0) * transform_percentage((x+ (i == 5 ? 1 : 0)), i),
         radius2 * sin(60 * i)
     ]];
 
