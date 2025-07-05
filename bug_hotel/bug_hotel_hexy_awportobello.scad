@@ -1,5 +1,6 @@
 // Parameters
 radius = 20;       // Distance from center to each vertex
+radius2 = 20;
 wall_thickness = 1;
 height = 40;
 corner_radius = wall_thickness / 2 + 0.1;
@@ -9,6 +10,15 @@ points = [ for(i = [0:5]) [
     radius * cos(60 * i),
     radius * sin(60 * i)
 ]];
+
+// TODO the co-ord used being +1 for i=0,1,5
+function pointsy(x, y) =
+    [ for(i = [0:5]) [ 
+//        (radius - x / 1) * cos(60 * i),
+//        (radius - x / 1) * sin(60 * i)
+        radius2 * cos(60 * i) + ((i % 2) == 0 ? 1 : -1) * (radius * sqrt(2.0)/3.0) * x / grid_size_x,
+        radius2 * sin(60 * i)
+    ]];
 
 // Module to draw a wall between two points
 module wall(p1, p2) {
@@ -30,22 +40,26 @@ module corner(p) {
         cylinder(h=height, r=corner_radius, center=true, $fn=8);
 }
 
-module draw_hex() {
+module draw_hex(x, y) {
     // Draw all six walls
+    pointo = pointsy(x, y);
     for (i = [0:5]) {
-        p1 = points[i];
-        p2 = points[(i + 1) % 6];
+        p1 = pointo[i];
+        p2 = pointo[(i + 1) % 6];
         wall(p1, p2);
     }
 }
 
+grid_size_x = 5;
+grid_size_y = 2;
+
 //draw_hex();
-for (y = [0:2]) {
-    for (x = [0:2]) {
+for (x = [0:grid_size_x-1]) {
+    for (y = [0:grid_size_y-1]) {
         x_offset = x * 1.5 * radius;
         y_offset = y * sqrt(3) * radius + (x % 2) * (sqrt(3)/2 * radius);
         translate([x_offset, y_offset, 0])
-            draw_hex();
+            draw_hex(x, y);
     }
 }
 
