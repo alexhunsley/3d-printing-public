@@ -5,6 +5,11 @@ wall_thickness = 1;
 height = 40;
 corner_radius = wall_thickness / 2 + 0.1;
 
+grid_size_x = 8;
+grid_size_y = 3;
+//grid_size_x = 2;
+//grid_size_y = 2;
+
 // Compute hexagon points (flat-top hexagon)
 points = [ for(i = [0:5]) [ 
     radius * cos(60 * i),
@@ -13,10 +18,11 @@ points = [ for(i = [0:5]) [
 
 // TODO the co-ord used being +1 for i=0,1,5
 function pointsy(x, y) =
-    [ for(i = [0:5]) [ 
+//    [ for(i = [0:5]) [ 
+    [ for(i = [2:5]) [ 
 //        (radius - x / 1) * cos(60 * i),
 //        (radius - x / 1) * sin(60 * i)
-        radius2 * cos(60 * i) + ((i % 2) == 0 ? 1 : -1) * (radius * sqrt(2.0)/3.0) * x / grid_size_x,
+        radius2 * cos(60 * i) + ((i % 2) == 1 ? 1 : -1) * (radius * sqrt(2.0)/3.0) * ((x+(i == 5 ? 1 : 0))/grid_size_x),
         radius2 * sin(60 * i)
     ]];
 
@@ -30,8 +36,8 @@ module wall(p1, p2) {
     cy = (p1[1] + p2[1]) / 2;
 
     translate([cx, cy, 0])
-    rotate([0, 0, angle])
-        cube([length, wall_thickness, height], center=true);
+        rotate([0, 0, angle])
+            cube([length, wall_thickness, height], center=true);
 }
 
 // Module to draw a corner cylinder at a point
@@ -43,15 +49,12 @@ module corner(p) {
 module draw_hex(x, y) {
     // Draw all six walls
     pointo = pointsy(x, y);
-    for (i = [0:5]) {
+    for (i = [0:len(pointo)-2]) {
         p1 = pointo[i];
         p2 = pointo[(i + 1) % 6];
         wall(p1, p2);
     }
 }
-
-grid_size_x = 5;
-grid_size_y = 2;
 
 //draw_hex();
 for (x = [0:grid_size_x-1]) {
