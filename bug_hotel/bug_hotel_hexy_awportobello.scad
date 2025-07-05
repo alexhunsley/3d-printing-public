@@ -30,11 +30,23 @@ module corner(p) {
         cylinder(h=height, r=corner_radius, center=true, $fn=8);
 }
 
-// Draw all six walls
-for (i = [0:5]) {
-    p1 = points[i];
-    p2 = points[(i + 1) % 6];
-    wall(p1, p2);
+module draw_hex() {
+    // Draw all six walls
+    for (i = [0:5]) {
+        p1 = points[i];
+        p2 = points[(i + 1) % 6];
+        wall(p1, p2);
+    }
+}
+
+//draw_hex();
+for (y = [0:2]) {
+    for (x = [0:2]) {
+        x_offset = x * 1.5 * radius;
+        y_offset = y * sqrt(3) * radius + (x % 2) * (sqrt(3)/2 * radius);
+        translate([x_offset, y_offset, 0])
+            draw_hex();
+    }
 }
 
 // might not need corner cylinders - 3 walls meeting (most places) will avoid holes
