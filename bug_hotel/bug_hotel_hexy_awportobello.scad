@@ -1,12 +1,11 @@
 // Parameters
-radius = 20;       // Distance from center to each vertex
-radius2 = 20;
-wall_thickness = 1;
-height = 40;
-corner_radius = wall_thickness / 2 + 0.1;
+radius = 32;       // Distance from center to each vertex
+wall_thickness = 1.0;
+height = 20;
+corner_radius = wall_thickness / 2;
 
-grid_size_x = 24;
-grid_size_y = 4;
+grid_size_x = 6;
+grid_size_y = 3;
 //grid_size_x = 2;
 //grid_size_y = 2;
 
@@ -19,8 +18,9 @@ points = [ for(i = [0:5]) [
 // 1.0 = no limit
 // 1.1 = 10% limit
 
-// do values > 1 like 2, 3.
-// 1 means no edge limits to transformation (it begins immediately)
+// speed of transition at centre.
+// try values > 1 like 2, 3.
+// 1 means no edge limits to transformation (it begins immediately at x extremes)
 no_tx_percentage_edge = 1.4;
 
 //echo(clamped_tx_percentage(0.0));
@@ -48,7 +48,7 @@ function clamped_tx_percentage(x) = clamp(0.5 + (x - 0.5) * no_tx_percentage_edg
 
 //function clamped_tx_percentage2(x) = 0.5 + (x - 0.5) * no_tx_percentage_edge;
 
-function transform_percentage(x, i) = (clamped_tx_percentage(x/grid_size_x) * (i == 3 || i == 5 ? 1 : 0));
+function transform_percentage(x, i) = (clamped_tx_percentage(x/(grid_size_x-1)) * (i == 3 || i == 5 ? 1 : 0));
 //function transform_percentage(x, i) = (x/grid_size_x * (i == 3 || i == 5 ? 1 : 0));
 //function transform_percentage(x, i) = 1.0;
 
@@ -58,8 +58,8 @@ function pointsy(x, y) =
     [ for(i = [2:5]) [ 
 //        (radius - x / 1) * cos(60 * i),
 //        (radius - x / 1) * sin(60 * i)
-        radius2 * cos(60 * i) - ((i % 2) == 0 ? 1 : -1) * (radius * sqrt(2.0)/3.0) * transform_percentage((x+ (i == 5 ? 1 : 0)), i),
-        radius2 * sin(60 * i)
+        radius * cos(60 * i) - ((i % 2) == 0 ? 1 : -1) * (radius * 1.06 * sqrt(2.0)/3.0) * transform_percentage((x+(i == 5 ? 1 : 0)), i),
+        radius * sin(60 * i)
     ]];
 
 // Module to draw a wall between two points
@@ -90,6 +90,10 @@ module draw_hex(x, y) {
         p2 = pointo[(i + 1) % 6];
         wall(p1, p2);
     }
+// might not need corner cylinders - 3 walls meeting (most places) will avoid holes
+    for (i = [0:len(pointo)-1]) {
+        corner(pointo[i]);
+    }
 }
 
 //draw_hex();
@@ -107,7 +111,3 @@ module draw_hex_grid() {
 
 draw_hex_grid();
 
-// might not need corner cylinders - 3 walls meeting (most places) will avoid holes
-//for (i = [0:5]) {
-//    corner(points[i]);
-//}
