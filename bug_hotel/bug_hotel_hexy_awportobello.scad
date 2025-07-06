@@ -12,6 +12,9 @@ corner_radius = wall_thickness / 2;
 grid_size_x = 6;
 grid_size_y = 3;
 
+// solid back behind all hexes
+back_plate_thickness = 0.6;
+
 //grid_size_x = 2;
 //grid_size_y = 2;
 
@@ -97,17 +100,31 @@ module corner(p, height) {
         cylinder(h=height, r=corner_radius, center=true, $fn=8);
 }
 
-module draw_hex(x, y, height) {
+module draw_hex(x, y) {
+    height = cell_height(x, y);
     // Draw all six walls
     pointo = pointsy(x, y);
-    for (i = [0:len(pointo)-2]) {
-        p1 = pointo[i];
-        p2 = pointo[(i + 1) % 6];
-        wall(p1, p2, height);
-    }
-// might not need corner cylinders - 3 walls meeting (most places) will avoid holes
-    for (i = [0:len(pointo)-1]) {
-        corner(pointo[i], height);
+
+    x_offset = x * 1.5 * layout_radius;
+    y_offset = y * sqrt(3) * layout_radius + (x % 2) * (sqrt(3)/2 * layout_radius);
+
+    translate([x_offset, y_offset, 0]) {
+        if (back_plate_thickness > 0.0) {
+            linear_extrude(back_plate_thickness)
+        //            offset(r=corner_radius)
+                polygon(pointo);
+        }
+        translate([0, 0, cell_height(x, y)/2]) {
+            for (i = [0:len(pointo)-2]) {
+                p1 = pointo[i];
+                p2 = pointo[(i + 1) % 6];
+                wall(p1, p2, height);
+                // might not need corner cylinders - 3 walls meeting (most places) will avoid holes
+                    for (i = [0:len(pointo)-1]) {
+                        corner(pointo[i], height);
+                    }               
+            }
+        }
     }
 }
 
@@ -118,10 +135,7 @@ function cell_height(x, y) = height - (grid_size_x - 1 - x) * height_delta_x - (
 module draw_hex_grid() {
     for (x = [0:grid_size_x-1]) {
         for (y = [0:grid_size_y-1]) {
-            x_offset = x * 1.5 * layout_radius;
-            y_offset = y * sqrt(3) * layout_radius + (x % 2) * (sqrt(3)/2 * layout_radius);
-            translate([x_offset, y_offset, cell_height(x, y)/2])
-                draw_hex(x, y, cell_height(x, y));
+            draw_hex(x, y);
         }
     }
 }
