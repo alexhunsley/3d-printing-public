@@ -1,8 +1,8 @@
 // Parameters
-points_radius = 22;       // Distance from center to each vertex
+points_radius = 24;       // Distance from center to each vertex
 layout_radius = 24;
 //wall_thickness = 5.0;
-wall_thickness = 1.0;
+wall_thickness = 4.0;
 height = 20;
 corner_radius = wall_thickness / 2;
 
