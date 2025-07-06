@@ -4,6 +4,8 @@ layout_radius = 24;
 //wall_thickness = 5.0;
 wall_thickness = 4.0;
 height = 20;
+// height reduced each row up
+height_delta = 1.5;
 corner_radius = wall_thickness / 2;
 
 grid_size_x = 6;
@@ -65,7 +67,7 @@ function pointsy(x, y) =
     ]];
 
 // Module to draw a wall between two points
-module wall(p1, p2) {
+module wall(p1, p2,, height) {
     dx = p2[0] - p1[0];
     dy = p2[1] - p1[1];
     length = sqrt(dx*dx + dy*dy);
@@ -79,37 +81,40 @@ module wall(p1, p2) {
 }
 
 // Module to draw a corner cylinder at a point
-module corner(p) {
+module corner(p, height) {
     translate([p[0], p[1], 0])
         cylinder(h=height, r=corner_radius, center=true, $fn=8);
 }
 
-module draw_hex(x, y) {
+module draw_hex(x, y, height) {
     // Draw all six walls
     pointo = pointsy(x, y);
     for (i = [0:len(pointo)-2]) {
         p1 = pointo[i];
         p2 = pointo[(i + 1) % 6];
-        wall(p1, p2);
+        wall(p1, p2, height);
     }
 // might not need corner cylinders - 3 walls meeting (most places) will avoid holes
     for (i = [0:len(pointo)-1]) {
-        corner(pointo[i]);
+        corner(pointo[i], height);
     }
 }
 
 //draw_hex();
+
+function cell_height(x, y) = height - (grid_size_x - 1 - x) * height_delta - ((y == 1) ? 0 : 4);
 
 module draw_hex_grid() {
     for (x = [0:grid_size_x-1]) {
         for (y = [0:grid_size_y-1]) {
             x_offset = x * 1.5 * layout_radius;
             y_offset = y * sqrt(3) * layout_radius + (x % 2) * (sqrt(3)/2 * layout_radius);
-            translate([x_offset, y_offset, 0])
-                draw_hex(x, y);
+            translate([x_offset, y_offset, cell_height(x, y)/2])
+                draw_hex(x, y, cell_height(x, y));
         }
     }
 }
 
-draw_hex_grid();
+scale(0.5)
+    draw_hex_grid();
 
