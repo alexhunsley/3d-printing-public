@@ -1,20 +1,24 @@
 // Parameters
-points_radius = 24;       // Distance from center to each vertex
-layout_radius = 24;
+points_radius = 22;       // Distance from center to each vertex
+layout_radius = 22;
 //wall_thickness = 5.0;
 wall_thickness = 4.0;
 height = 20;
 // height reduced each row up
-height_delta = 1.5;
+height_delta = 1.0;
 corner_radius = wall_thickness / 2;
 
-grid_size_x = 6;
+grid_size_x = 7;
 grid_size_y = 3;
 //grid_size_x = 2;
 //grid_size_y = 2;
 
 morph_dir = 1;
-end_morph_factor = 1.65;
+end_morph_factor = 2;
+
+// offset to get design based strictly +ve from x,y origin
+offs = [layout_radius * 2 * sqrt(2) / 3  + 4.0/2,
+        layout_radius * sqrt(3) / 2  + 4.0/2];
 
 // Compute hexagon points (flat-top hexagon)
 //points = [ for(i = [0:5]) [ 
@@ -120,5 +124,6 @@ module draw_hex_grid() {
 }
 
 //scale(0.5)
+translate([offs[0], offs[1], 0])
     draw_hex_grid();
 
