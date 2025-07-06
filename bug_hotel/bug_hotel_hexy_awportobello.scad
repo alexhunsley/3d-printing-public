@@ -13,6 +13,9 @@ grid_size_y = 3;
 //grid_size_x = 2;
 //grid_size_y = 2;
 
+morph_dir = 1;
+end_morph_factor = 1.65;
+
 // Compute hexagon points (flat-top hexagon)
 //points = [ for(i = [0:5]) [ 
 //    points_radius * cos(60 * i),
@@ -25,7 +28,7 @@ grid_size_y = 3;
 // speed of transition at centre.
 // try values > 1 like 2, 3.
 // 1 means no edge limits to transformation (it begins immediately at x extremes)
-no_tx_percentage_edge = 1.;
+no_tx_percentage_edge = 1;
 
 //echo(clamped_tx_percentage(0.0));
 //echo(clamped_tx_percentage(0.1));
@@ -52,17 +55,18 @@ function clamped_tx_percentage(x) = clamp(0.5 + (x - 0.5) * no_tx_percentage_edg
 
 //function clamped_tx_percentage2(x) = 0.5 + (x - 0.5) * no_tx_percentage_edge;
 
-function transform_percentage(x, i) = (clamped_tx_percentage(x/(grid_size_x-1)) * (i == 1 || i == 3 || i == 3 || i == 5 ? 1 : 0));
+// ret 1 for odd, 0 for false
+function isOdd(x) = x % 2;
+function isEven(x) = (x + 1) % 2;
+
+function transform_percentage(x, i) = (clamped_tx_percentage(x/(grid_size_x-1)) * isOdd(i));
 //function transform_percentage(x, i) = (x/grid_size_x * (i == 3 || i == 5 ? 1 : 0));
 //function transform_percentage(x, i) = 1.0;
 
 // TODO the co-ord used being +1 for i=0,1,5
 function pointsy(x, y) =
-//    [ for(i = [0:5]) [ 
     [ for(i = [0:6]) [ 
-//        (radius - x / 1) * cos(60 * i),
-//        (radius - x / 1) * sin(60 * i)
-        points_radius * cos(60 * i) - ((i % 2) == 0 ? 1 : -1) * (points_radius * 1.06 * sqrt(2.0)/3.0) * transform_percentage((x+(i == 1 || i == 5 ? 1 : 0)), i),
+        points_radius * cos(60 * i) - ((i % 2) == 0 ? morph_dir : -morph_dir) * (points_radius * 1.06 * sqrt(2.0)/3.0) * end_morph_factor * transform_percentage((x+(i == 1 || i == 5 ? 1 : 0)), i),
         points_radius * sin(60 * i)
     ]];
 
@@ -115,6 +119,6 @@ module draw_hex_grid() {
     }
 }
 
-scale(0.5)
+//scale(0.5)
     draw_hex_grid();
 
