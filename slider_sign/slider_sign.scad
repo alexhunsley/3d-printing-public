@@ -7,16 +7,15 @@
 // top has little tabs that insert into bottom to hold together.
 //
 
-width = 80;
+width = 50;
 height = 14;
-depth = 10;
 
 // slider fit gap in z dir
-depth_gap = 0.2;
+depth_gap = 0.05;
 
-depth_slider = 1; // 1.25
+depth_slider = 0.5; // 1.25
 depth_cover_lip = 0.5; // lip that goes over bit of slider vertically
-depth_bottom = 1.0;
+depth_bottom = 0.5;
 
 // internal space in 'top' for slider
 //depth_top_space = depth_top - (depth_slider + depth_gap*2);
@@ -24,19 +23,21 @@ depth_top_space = depth_slider + 2 * depth_gap;
 
 depth_top = depth_top_space + depth_cover_lip;
 
-text = ["open", "closed"];
+//text = ["open", "closed"];
+text = ["A", "B"];
+
 text_depth = 0.3;
 text_size = 4.5;
 text_y_adj = 1.6;
 
 eps = 0.01;
 
-tx = width / 2 + 3;
-ty = 22;
+tx = width / 2 + 2;
+ty = 16;
 
 gap = 0.1;
 
-wall_thickness = [4, 2];
+wall_thickness = [3, 2];
 
 reg_dim = [0.75, height - wall_thickness[1]*2, 0];
 
@@ -44,8 +45,9 @@ reg_dim = [0.75, height - wall_thickness[1]*2, 0];
 slider_cover_vert_amount = 1.5;
 
 grip_y_gap = 1;
+slider_y_gap = 0.3;
 
-slider_grip_dim = [1, height - (wall_thickness[1] + slider_cover_vert_amount + grip_y_gap)*2, 2];
+slider_grip_dim = [1, height - (wall_thickness[1] + slider_cover_vert_amount + grip_y_gap)*2, 1];
 
 
 module top() {
@@ -55,8 +57,8 @@ module top() {
     difference() {
         cube([width, height, depth_top], center = true);
         // subtract main space for slider
-        translate([0, 0, depth_top/2 - depth_slider/2 + eps])
-            cube([ww, hh, depth_slider], center = true);
+        translate([0, 0, depth_top/2 - depth_slider/2 - depth_gap - eps])
+            cube([ww, hh, depth_slider + depth_gap*2 + eps*2], center = true);
         // subtract window (smaller vertically so slider doesn't fall out)
        
         cube([ww, hh - slider_cover_vert_amount*2, 10], center=true);
@@ -94,7 +96,7 @@ module bottom() {
 
 module slider() {
     ww = (width - wall_thickness[0]*2 - reg_dim[0]) / 2;
-    hh = height - wall_thickness[1]*2;
+    hh = height - wall_thickness[1]*2 - slider_y_gap;
     translate([ww/2, 0, 0]) {
         cube([ww, hh, depth_slider], center=true);
         translate([0, 0, depth_slider/2 + slider_grip_dim[2]/2 - eps])
@@ -103,17 +105,22 @@ module slider() {
     }
 }
 
-slider();
+//slider();
 
-translate([tx, ty, 0])
-    slider();
+//translate([tx, ty, 0])
+//    slider();
 
-translate([tx, ty * 2, 0])
+
+translate([0, 0, 0])
+    top();
+
+translate([tx, 0, 0])
     slider();
 
 translate([0, ty, 0])
     bottom();
 
-translate([0, 2*ty, 0])
-    top();
+//translate([0, -ty, 0])
+//    slider();
+
 
