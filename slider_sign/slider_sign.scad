@@ -7,15 +7,15 @@
 // top has little tabs that insert into bottom to hold together.
 //
 
-width = 50;
-height = 14;
+width = 125;
+height = 25;
 
 // slider fit gap in z dir
 depth_gap = 0.05;
 
-depth_slider = 0.5; // 1.25
-depth_cover_lip = 0.5; // lip that goes over bit of slider vertically
-depth_bottom = 0.5;
+depth_slider = 2; // 1.25
+depth_cover_lip = 1; // lip that goes over bit of slider vertically
+depth_bottom = 1.5;
 
 // internal space in 'top' for slider
 //depth_top_space = depth_top - (depth_slider + depth_gap*2);
@@ -23,31 +23,31 @@ depth_top_space = depth_slider + 2 * depth_gap;
 
 depth_top = depth_top_space + depth_cover_lip;
 
-//text = ["open", "closed"];
-text = ["A", "B"];
+text = ["open", "closed"];
+//text = ["A", "B"];
 
-text_depth = 0.3;
-text_size = 4.5;
-text_y_adj = 1.6;
+text_depth = 0.6;
+text_size = 7;
+text_y_adj = 3;
 
 eps = 0.01;
 
-tx = width / 2 + 2;
-ty = 16;
+tx = width / 2 + 5;
+ty = 35;
 
 gap = 0.1;
 
 wall_thickness = [3, 2];
 
-reg_dim = [0.75, height - wall_thickness[1]*2, 0];
+reg_dim = [1, height - wall_thickness[1]*2, 0];
 
 // vertical overlap of top piece over slider (stop it falling out!)
-slider_cover_vert_amount = 1.5;
+slider_cover_vert_amount = 3;
 
 grip_y_gap = 1;
 slider_y_gap = 0.3;
 
-slider_grip_dim = [1, height - (wall_thickness[1] + slider_cover_vert_amount + grip_y_gap)*2, 1];
+slider_grip_dim = [1.5, height - (wall_thickness[1] + slider_cover_vert_amount + grip_y_gap)*2, 2];
 
 
 module top() {
