@@ -7,13 +7,13 @@
 // top has little tabs that insert into bottom to hold together.
 //
 
-width = 125;
+width = 110;
 height = 25;
 
 // slider fit gap in z dir
 depth_gap = 0.05;
 
-depth_slider = 2; // 1.25
+depth_slider = 1.2; // 1.25
 depth_cover_lip = 1; // lip that goes over bit of slider vertically
 depth_bottom = 1.5;
 
@@ -27,8 +27,8 @@ text = ["open", "closed"];
 //text = ["A", "B"];
 
 text_depth = 0.6;
-text_size = 7;
-text_y_adj = 3;
+text_size = 9;
+text_y_adj = 3.8;
 
 eps = 0.01;
 
@@ -37,7 +37,7 @@ ty = 35;
 
 gap = 0.1;
 
-wall_thickness = [3, 2];
+wall_thickness = [3, 3];
 
 reg_dim = [1, height - wall_thickness[1]*2, 0];
 
@@ -65,12 +65,19 @@ module top() {
 //        slider_cover_vert_amount
     }
     
-    // reg keys
+    // reg keys - left and right
     for (i = [-1 : 2 : 1]) {
         scale([i, 1, 1])
             translate([-width/2 + wall_thickness[0] - reg_dim[0]/2, 0, (depth_top + depth_bottom)/2])
                 cube([reg_dim[0], reg_dim[1], depth_bottom], center=true);
     }
+    // reg keys - top and bottom
+    for (i = [-1 : 2 : 1]) {
+        scale([1, i, 1])
+            translate([0, -height/2 + wall_thickness[1] - reg_dim[0]/2, (depth_top + depth_bottom)/2])
+                cube([reg_dim[1], reg_dim[0], depth_bottom], center=true);
+    }
+    
 }
 
 module bottom() {
@@ -84,11 +91,17 @@ module bottom() {
             translate([width/4, -text_y_adj, depth_bottom / 2 + eps - text_depth])
                 linear_extrude(text_depth)
                     text(text[1], text_size, halign="center");
-            // reg holes
+            // reg holes - sides
             for (i = [-1 : 2 : 1]) {
                 scale([i, 1, 1])
                     translate([-width/2 + wall_thickness[0] - reg_dim[0]/2, 0, 0])
                         cube([reg_dim[0], reg_dim[1], 2], center=true);
+            }
+            // reg holes - top and bottom
+            for (i = [-1 : 2 : 1]) {
+                scale([1, i, 1])
+                    translate([0, -height/2 + wall_thickness[1] - reg_dim[0]/2, 0])
+                        cube([reg_dim[1], reg_dim[0], 2], center=true);
             }
         }
     }
@@ -112,6 +125,7 @@ module slider() {
 
 
 translate([0, 0, 0])
+//translate([0, ty, 4])
     top();
 
 translate([tx, 0, 0])
