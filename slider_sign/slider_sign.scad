@@ -13,7 +13,7 @@ height = 25;
 // slider fit gap in z dir
 depth_gap = 0.05;
 
-depth_slider = 1.2; // 1.25
+depth_slider = 1; // 1.25
 depth_cover_lip = 1; // lip that goes over bit of slider vertically
 depth_bottom = 1.5;
 
@@ -85,10 +85,10 @@ module bottom() {
         cube([width, height, depth_bottom], center = true);
         union() {
             // texts
-            translate([-width/4, -text_y_adj, depth_bottom / 2 + eps - text_depth])
+            translate([-(width/4 - wall_thickness[0]/2), -text_y_adj, depth_bottom / 2 + eps - text_depth])
                 linear_extrude(text_depth)
                     text(text[0], text_size, halign="center");
-            translate([width/4, -text_y_adj, depth_bottom / 2 + eps - text_depth])
+            translate([width/4 - wall_thickness[0]/2, -text_y_adj, depth_bottom / 2 + eps - text_depth])
                 linear_extrude(text_depth)
                     text(text[1], text_size, halign="center");
             // reg holes - sides
@@ -134,7 +134,9 @@ translate([tx, 0, 0])
 translate([0, ty, 0])
     bottom();
 
-//translate([0, -ty, 0])
+// put slider over text to check centering
+//scale([1, 1, 1])
+//translate([0, ty, 2])
 //    slider();
 
 
