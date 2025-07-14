@@ -10,6 +10,7 @@
 width = 110;
 height = 25;
 
+
 // slider fit gap in z dir
 depth_gap = 0.05;
 
@@ -23,8 +24,13 @@ depth_top_space = depth_slider + 2 * depth_gap;
 
 depth_top = depth_top_space + depth_cover_lip;
 
-text = ["open", "closed"];
-//text = ["A", "B"];
+text = [["open", "closed"], ["norman", "guthrie"]];
+//text = [["open", "closed"]];
+
+// for > 1 slider, we arrange vertically.
+// lazy approach: we overlay the single slider design
+// with correct offsets (it should render to the same final idea)
+num_slider_instances = len(text);
 
 text_depth = 0.6;
 text_size = 9;
@@ -32,14 +38,14 @@ text_y_adj = 3.8;
 
 eps = 0.01;
 
-tx = width / 2 + 5;
+tx = width + 5;
 ty = 35;
 
 gap = 0.1;
 
 wall_thickness = [3, 3];
 
-reg_dim = [1, height - wall_thickness[1]*2, 0];
+reg_dim = [1.5, height - wall_thickness[1]*3, 0];
 
 // vertical overlap of top piece over slider (stop it falling out!)
 slider_cover_vert_amount = 3;
@@ -47,8 +53,13 @@ slider_cover_vert_amount = 3;
 grip_y_gap = 1;
 slider_y_gap = 0.3;
 
-slider_grip_dim = [1.5, height - (wall_thickness[1] + slider_cover_vert_amount + grip_y_gap)*2, 2];
+// slider grip == little handle for moving it left/right
+slider_grip_y = height - (wall_thickness[1] + slider_cover_vert_amount + grip_y_gap)*2;
+slider_grip_dim = [1.5, slider_grip_y * 0.75, 2];
 
+slider_instance_offset_y = height - wall_thickness[1]*2 + reg_dim[0];
+
+top_bottom_reg_dim_x_mult = 2; // a local extra width mult
 
 module top() {
     ww = width - wall_thickness[0]*2;
@@ -74,34 +85,35 @@ module top() {
     // reg keys - top and bottom
     for (i = [-1 : 2 : 1]) {
         scale([1, i, 1])
-            translate([0, -height/2 + wall_thickness[1] - reg_dim[0]/2, (depth_top + depth_bottom)/2])
-                cube([reg_dim[1], reg_dim[0], depth_bottom], center=true);
+            translate([0, -height/2 + wall_thickness[1] - reg_dim[0]/2,
+                (depth_top + depth_bottom)/2])
+                    cube([top_bottom_reg_dim_x_mult * reg_dim[1], reg_dim[0], depth_bottom], center=true);
     }
     
 }
 
-module bottom() {
+module bottom(instance_y_idx) {
     difference() {
         cube([width, height, depth_bottom], center = true);
         union() {
             // texts
             translate([-(width/4 - wall_thickness[0]/2), -text_y_adj, depth_bottom / 2 + eps - text_depth])
                 linear_extrude(text_depth)
-                    text(text[0], text_size, halign="center");
+                    text(text[instance_y_idx][0], text_size, halign="center");
             translate([width/4 - wall_thickness[0]/2, -text_y_adj, depth_bottom / 2 + eps - text_depth])
                 linear_extrude(text_depth)
-                    text(text[1], text_size, halign="center");
+                    text(text[instance_y_idx][1], text_size, halign="center");
             // reg holes - sides
             for (i = [-1 : 2 : 1]) {
                 scale([i, 1, 1])
                     translate([-width/2 + wall_thickness[0] - reg_dim[0]/2, 0, 0])
                         cube([reg_dim[0], reg_dim[1], 2], center=true);
             }
-            // reg holes - top and bottom
+            // reg keyholes - top and bottom
             for (i = [-1 : 2 : 1]) {
                 scale([1, i, 1])
                     translate([0, -height/2 + wall_thickness[1] - reg_dim[0]/2, 0])
-                        cube([reg_dim[1], reg_dim[0], 2], center=true);
+                        cube([top_bottom_reg_dim_x_mult * reg_dim[1], reg_dim[0], 2], center=true);
             }
         }
     }
@@ -118,25 +130,21 @@ module slider() {
     }
 }
 
-//slider();
 
-//translate([tx, ty, 0])
-//    slider();
+axis_clearance_shift = 10;
 
+translate([axis_clearance_shift + width / 2,
+           axis_clearance_shift + height / 2, 0]) {
+            
+    for (yy = [0 : num_slider_instances - 1]) {
+        translate([0, slider_instance_offset_y * yy, 0]) {
+            top();
 
-translate([0, 0, 0])
-//translate([0, ty, 4])
-    top();
-
-translate([tx, 0, 0])
-    slider();
-
-translate([0, ty, 0])
-    bottom();
-
-// put slider over text to check centering
-//scale([1, 1, 1])
-//translate([0, ty, 2])
-//    slider();
-
+            translate([tx, 0, 0])
+                bottom(num_slider_instances - yy - 1);
+        }
+        translate([tx*1.5, slider_instance_offset_y * yy, 0])
+            slider();
+    }
+}
 
