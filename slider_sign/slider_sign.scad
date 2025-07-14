@@ -67,6 +67,9 @@ module top() {
     
     difference() {
         cube([width, height, depth_top], center = true);
+        // maybe later, needs tweaking
+//        rounded_rect(width, height, depth_top, 0);
+        
         // subtract main space for slider
         translate([0, 0, depth_top/2 - depth_slider/2 - depth_gap - eps])
             cube([ww, hh, depth_slider + depth_gap*2 + eps*2], center = true);
@@ -148,3 +151,45 @@ translate([axis_clearance_shift + width / 2,
     }
 }
 
+//module rounded_rect(size_x, size_y, height, radius, center=true) {
+//    corner_segments = 8;
+//    linear_extrude(height) {
+//        // degenerate case where it's just a rect
+//        if (radius <= 0) {
+//            square([size_x, size_y], center = true); 
+//        }
+//        else {
+//            hull() {
+//                translate([-size_x/2 + radius, -size_y/2 + radius, 0])
+//                    // we use intersection to only generate the quarter of the circle
+//                    // we actually need for generating the hull
+//                    intersection() {
+//                        circle(radius, $fn = corner_segments * 4);
+//                        scale([-1, -1, 0])
+//                            square([radius, radius], center = center);
+//                    }
+//
+//                translate([size_x/2 - radius, -size_y/2 + radius, 0])
+//                    intersection() {
+//                        circle(radius, $fn = corner_segments * 4);
+//                        scale([1, -1, 0])
+//                            square([radius, radius], center = center);
+//                    }
+//
+//                translate([-size_x/2 + radius, size_y/2 - radius, 0])
+//                    intersection() {
+//                        circle(radius, $fn = corner_segments * 4);
+//                        scale([-1, 1, 0])
+//                            square([radius, radius], center = center);
+//                    }
+//
+//                translate([size_x/2 - radius, size_y/2 - radius, 0])
+//                    intersection() {
+//                        circle(radius, $fn = corner_segments * 4);
+//                        square([radius, radius], center = center);
+//                    }
+//            }
+//        }
+//    }
+//}
+//
