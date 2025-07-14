@@ -37,7 +37,7 @@ text_y_adj = 3.8;
 
 eps = 0.01;
 
-tx = width + 5;
+tx = width + 12;
 ty = 35;
 
 gap = 0.1;
@@ -119,6 +119,23 @@ module bottom(instance_y_idx) {
             }
         }
     }
+    // mounting hole
+    mounting_hole_ext_radius = 6;
+    mounting_hole_radius = 1.5;
+    horiz_portion_len = 4;
+    for (i = [-1 : 2 : 1]) {
+        scale([i, 1, 1])
+            difference() {
+                union() {
+                    translate([-width/2+eps - horiz_portion_len/2, 0, 0])
+                        cube([horiz_portion_len, mounting_hole_ext_radius*2, depth_bottom], center = true); 
+                    translate([-width/2+eps - horiz_portion_len, 0, 0])
+                        cylinder(depth_bottom, mounting_hole_ext_radius, mounting_hole_ext_radius, center=true, $fn=32);
+                }
+                translate([-width/2+eps - horiz_portion_len, 0, -eps])
+                    cylinder(depth_bottom + 2*eps, mounting_hole_radius, mounting_hole_radius, center=true, $fn=16);
+            }
+    }
 }
 
 module slider() {
@@ -132,7 +149,6 @@ module slider() {
     }
 }
 
-
 axis_clearance_shift = 10;
 
 translate([axis_clearance_shift + width / 2,
@@ -145,7 +161,7 @@ translate([axis_clearance_shift + width / 2,
             translate([tx, 0, 0])
                 bottom(num_slider_instances - yy - 1);
         }
-        translate([tx*1.5, slider_instance_offset_y * yy, 0])
+        translate([tx*1.6, slider_instance_offset_y * yy, 0])
             slider();
     }
 }
