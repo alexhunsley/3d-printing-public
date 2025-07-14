@@ -10,7 +10,6 @@
 width = 110;
 height = 25;
 
-
 // slider fit gap in z dir
 depth_gap = 0.05;
 
@@ -45,10 +44,10 @@ gap = 0.1;
 
 wall_thickness = [3, 3];
 
-reg_dim = [1.5, height - wall_thickness[1]*3, 0];
+reg_dim = [1, height - wall_thickness[1]*3, 0];
 
 // vertical overlap of top piece over slider (stop it falling out!)
-slider_cover_vert_amount = 3;
+slider_cover_vert_amount = 1.5;
 
 grip_y_gap = 1;
 slider_y_gap = 0.3;
@@ -57,7 +56,7 @@ slider_y_gap = 0.3;
 slider_grip_y = height - (wall_thickness[1] + slider_cover_vert_amount + grip_y_gap)*2;
 slider_grip_dim = [1.5, slider_grip_y * 0.75, 2];
 
-slider_instance_offset_y = height - wall_thickness[1]*2 + reg_dim[0];
+slider_instance_offset_y = height - wall_thickness[1];
 
 top_bottom_reg_dim_x_mult = 2; // a local extra width mult
 
@@ -88,7 +87,7 @@ module top() {
     // reg keys - top and bottom
     for (i = [-1 : 2 : 1]) {
         scale([1, i, 1])
-            translate([0, -height/2 + wall_thickness[1] - reg_dim[0]/2,
+            translate([0, -height/2 + wall_thickness[1]/2,
                 (depth_top + depth_bottom)/2])
                     cube([top_bottom_reg_dim_x_mult * reg_dim[1], reg_dim[0], depth_bottom], center=true);
     }
@@ -115,7 +114,7 @@ module bottom(instance_y_idx) {
             // reg keyholes - top and bottom
             for (i = [-1 : 2 : 1]) {
                 scale([1, i, 1])
-                    translate([0, -height/2 + wall_thickness[1] - reg_dim[0]/2, 0])
+                    translate([0, -height/2 + wall_thickness[1]/2, 0])
                         cube([top_bottom_reg_dim_x_mult * reg_dim[1], reg_dim[0], 2], center=true);
             }
         }
