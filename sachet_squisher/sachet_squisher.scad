@@ -3,12 +3,10 @@
 // efficiently feed your cats!
 
 $fn = 128;
-eps = 0.001;
 
 do_cutaway = false;
-// also enable second cutaway to see a clear profile of the holes
+// enable both cutaways to see a clear profile of the V cut
 do_cutaway2 = false;
-
 
 slot_width = 110;
 slot_y = 5;
@@ -26,10 +24,14 @@ corner_radius = 5;
 text_depth = 0.4;
 text_y = 5.25;
 
+module __Customizer_Limit__ () {}
+
+/////////////////////////////////////////////////////////////////////////////////
+
+eps = 0.001;
+
 size = [slot_width + 2 * margin, 35, squisher_depth];
 
-echo("Mirror append: ", mirror_x_append([[1, 0], [2, 1], [-3, 10]]));
-         
 function slot_profile_points(slot_gap) =
     mirror_poly_points_x(
         [[slot_gap/2, 0],
