@@ -1,6 +1,14 @@
 // sachet_squisher.scad
 //
 // efficiently feed your cats!
+//
+//
+// Recommended print settings:
+//
+//      Layer size: 0.2mm
+//        Material: PLA
+//     Orientation: as given (text facing up)
+//         Support: not required
 
 $fn = 128;
 
