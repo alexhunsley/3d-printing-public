@@ -15,13 +15,11 @@ inf = 50;
 eps = 0.001;
 
 // thickness of 'wood grasping' parts
-//a = 2;
 a = 1.5;
 
 // base z thicknesses
 b = 1.25;
 c = 1.5;
-
 d = 1.5;
 
 // support pillars for 'no Y gap' design
@@ -37,12 +35,10 @@ W = 3.25;
 G = -0.2;
 //G = 1.0;
 
-// protrusion of the arm grippers away from centre
-f = 10.0;
+// protrusion of the arm grippers away from centre. Higher values improve rigidness of shelves grid.
+f = 20.0;
 
-// 'nobble' grip radius
-//r = 0; // impl later
-// 'nobble' sticking out amount
+// 'nobble' grip radius (sticking out amount)
 K = 0; // impl later, but this var is used currently
 
 T_1 = 2 * (K + G) + W;
@@ -98,9 +94,10 @@ module base_for_cutting(doing_front_piece = true) {
 }
 
 // de-confusion helper: cuts a circle on the side that should face up or down in final construction
-helper_circle_enable = true;
-helper_circle_radius = 1.5;
-helper_circle_depth = 0.3;
+//  -- not used?
+//helper_circle_enable = true;
+//helper_circle_radius = 1.5;
+//helper_circle_depth = 0.3;
 
 
 module main(doing_front_piece = true, miss_centre_beam_angles = [], miss_quarter_cut_angles = [], no_y_gap_fix_enabled = true) {
@@ -209,8 +206,8 @@ module main(doing_front_piece = true, miss_centre_beam_angles = [], miss_quarter
 // enable_support = false;
 
 
-piece_tx = 36;
-piece_tx_front_back = 17;
+piece_tx = 50;
+piece_tx_front_back = 26;
 circle_segs = 32;
 
 module quarter_cylinder(h, r, res = circle_segs) {
@@ -226,22 +223,22 @@ module quarter_cylinder(h, r, res = circle_segs) {
 }
 
 
-module all_pieces(doing_front_piece, no_y_gap_fix_enabled = true, piece_counts) {
-    displace = 32;
+module all_pieces_inner(doing_front_piece, no_y_gap_fix_enabled = true, piece_counts) {
+
     echo("Piece counts:", piece_counts);
     
 //    translate([0, doing_front_piece ? 0 : piece_tx, 0]) {
         // piece 1 (entire piece) - most common
     if (piece_counts[2] > 0)
         for (p1 = [0 : piece_counts[2] - 1]) {
-            translate([2*piece_tx, p1 * displace, -eps])
+            translate([2*piece_tx, p1 * piece_tx, -eps])
                 main(doing_front_piece, no_y_gap_fix_enabled = no_y_gap_fix_enabled);
         }
     
     if (piece_counts[1] > 0)
         for (p2 = [0 : piece_counts[1] -1]) {
             // piece 2 (two quadrants) - next most common
-            translate([0, p2 * displace, 0]) {
+            translate([0, p2 * piece_tx, 0]) {
                 intersection() {
                     main(doing_front_piece, miss_centre_beam_angles = [90], miss_quarter_cut_angles = [90, 180], no_y_gap_fix_enabled = no_y_gap_fix_enabled);
                     translate([-T_1b / 2, -inf/2, 0])
@@ -253,7 +250,7 @@ module all_pieces(doing_front_piece, no_y_gap_fix_enabled = true, piece_counts) 
     if (piece_counts[0] > 0)
         for (p3 = [0 : piece_counts[0] - 1]) {
             // piece 3 (one quadrant) - most rare
-            translate([-2*piece_tx, p3 * displace, -eps])
+            translate([-2*piece_tx, p3 * piece_tx, -eps])
                 intersection() {
                     main(doing_front_piece, miss_centre_beam_angles = [90, 180], miss_quarter_cut_angles = [90, 180, 270], no_y_gap_fix_enabled = no_y_gap_fix_enabled);
                     translate([-T_1b / 2, -T_1b / 2, 0])
@@ -262,12 +259,15 @@ module all_pieces(doing_front_piece, no_y_gap_fix_enabled = true, piece_counts) 
         }
 }
 
-module all_pieces_front_and_back(no_y_gap_fix_enabled = true, piece_counts) {
+module all_pieces(do_back=true, no_y_gap_fix_enabled = true, piece_counts) {
 //    translate([piece_tx_front_back, 0, 0])
-        color("#AAA")
-            all_pieces(doing_front_piece = true, no_y_gap_fix_enabled = true, piece_counts = piece_counts);
-    translate([-piece_tx_front_back*1.9, 0, 0])
-        all_pieces(doing_front_piece = false, no_y_gap_fix_enabled = true, piece_counts = piece_counts);
+    color("#AAA")
+        all_pieces_inner(doing_front_piece = true, no_y_gap_fix_enabled, piece_counts = piece_counts);
+
+    if (do_back) {
+        translate([-piece_tx_front_back*1.9, 0, 0])
+            all_pieces_inner(doing_front_piece = false, no_y_gap_fix_enabled, piece_counts = piece_counts);    
+    }
 }
 
 // We only strictly need THREE pieces!
@@ -304,7 +304,12 @@ panel_thickness = W;
 // a little give to help rotating and slotting in the panels
 pillar_gap = 0.3;
 
-//piece_c = piece_counts(5, 4);
+// X, T, L counts (for just front)
+//piece_counts = [0, 0, 1];
+
+// x, y pigeon holes
+piece_counts = piece_counts(2, 2);
+
 
 // (5, 4) needs [4, 14, 12] of LTX.
 // Already got 4 L.
@@ -314,31 +319,33 @@ pillar_gap = 0.3;
 //
 // piece_mult = 2 does both front and back pieces
 
-piece_c = [1, 8, 4];
 
 rotate([0, 0, -90]) {
-    all_pieces_front_and_back(true, piece_c);
+    all_pieces(false,      // do back
+               false,     // no_y_gap_fix_enabled
+               piece_counts);
     guide_letters();
 }
 
 module guide_letters() {
     color("red") {
-        translate([0, -45, 0]) {
-            translate([7, 0, 0]) {
+        translate([0, -60, 0]) {
+            translate([0, 0, 0]) {
                 rotate([0, 0, 90])
                     text("T", 40, halign="center");  
-            }
-            translate([75, 0, 0]) {
-                rotate([0, 0, 90])
-                    text("X", 40, halign="center");  
-            }
-            translate([-63, 0, 0]) {
-                rotate([0, 0, 90])
-                    text("L", 40, halign="center");  
+
+                translate([2*piece_tx, 0, 0]) {
+                    rotate([0, 0, 90])
+                        text("X", 40, halign="center");  
+                }
+                translate([-2*piece_tx, 0, 0]) {
+                    rotate([0, 0, 90])
+                        text("L", 40, halign="center");  
+                }
             }
         }      
     }
-    translate([120, -60, 0]) {
+    translate([3.1*piece_tx, -20, 0]) {
         rotate([0, 0, 90]) {
             text("Grey: front pieces", 20);
             translate([0, -28, 0])
