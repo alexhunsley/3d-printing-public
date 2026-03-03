@@ -4,15 +4,16 @@ Based on something I saw on t'net. Just a thingy to get all the food out of a sa
 
 Please wash squisher after use. Every now and then sterilise it (or re-print it).
 
-<table>
-  <tr>
-    <td><img src="images/sachet_squisher_3d.png" width=600 /></td>
-  </tr>
-  <tr> 
-    <td><img src="images/sachet_squisher_cut_profile.png" width=600 /></td>
-  </tr>
-</table>
-
+<div align="center">
+  <table halign="center">
+    <tr>
+      <td><img src="images/sachet_squisher_3d.png" width=600 /></td>
+    </tr>
+    <tr> 
+      <td><img src="images/sachet_squisher_cut_profile.png" width=600 /></td>
+    </tr>
+  </table>
+</div>
 
 
 
