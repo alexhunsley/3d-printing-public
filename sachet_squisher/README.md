@@ -6,7 +6,9 @@ Please wash squisher after use. Every now and then sterilise it (or re-print it)
 
 <table>
   <tr>
-    <td><img src="images/sachet_squisher.png" /></td>
+    <td><img src="images/sachet_squisher_3d.png" /></td>
+  </tr>
+  <tr> 
     <td><img src="images/sachet_squisher_cut_profile.png" /></td>
   </tr>
 </table>
